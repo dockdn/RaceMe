@@ -1,0 +1,24 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+<style name="Theme.RaceMe" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <!-- Primary brand colors -->
+    <item name="colorPrimary">#B64D4D</item> <!-- dusty red -->
+    <item name="colorPrimaryVariant">#8B3E3E</item>
+    <item name="colorOnPrimary">#FFFFFF</item>
+
+    <!-- Secondary -->
+    <item name="colorSecondary">#FFE5CC</item> <!-- creamy -->
+    <item name="colorSecondaryVariant">#F5D1B5</item>
+    <item name="colorOnSecondary">#000000</item>
+
+    <!-- Background -->
+    <item name="android:colorBackground">#FFF8F2</item>
+    <item name="colorSurface">#FFF8F2</item>
+    <item name="colorOnSurface">#2D2D2D</item>
+
+    <!-- Disable dynamic colors -->
+    <item name="dynamicColorThemeOverlay">@null</item>
+
+    <!-- Use MaterialComponents widgets -->
+    <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button</item>
+</style>
+</resources>

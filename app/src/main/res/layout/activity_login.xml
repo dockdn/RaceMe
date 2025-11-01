@@ -1,0 +1,53 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/cream"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:padding="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LOGIN AND REGISTRATION"
+            android:textSize="28sp"
+            android:textColor="@color/dusty_red"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:id="@+id/inputEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:layout_marginTop="24dp"/>
+
+        <EditText
+            android:id="@+id/inputPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:layout_marginTop="12dp"/>
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LOGIN"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/dusty_red"
+            android:textColor="@color/cream"/>
+
+        <TextView
+            android:id="@+id/linkRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create an account"
+            android:textColor="@color/dusty_red"
+            android:layout_marginTop="16dp"/>
+    </LinearLayout>
+</ScrollView>

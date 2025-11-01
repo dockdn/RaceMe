@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "923242861024",
+    "project_id": "raceme-33d20",
+    "storage_bucket": "raceme-33d20.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:923242861024:android:6715b209814991b97e5b85",
+        "android_client_info": {
+          "package_name": "com.example.raceme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArudeEe4zExINWGPnVUmCTunPhu40xauw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

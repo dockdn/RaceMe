@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF8F2">
+
+    <!-- ===== MAIN RUN CONTROLS (shown when run starts) ===== -->
+    <LinearLayout
+        android:id="@+id/runControls"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Live miles label -->
+        <TextView
+            android:id="@+id/tvMiles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.00 mi"
+            android:textColor="#B64D4D"
+            android:textSize="20sp"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Timer -->
+        <Chronometer
+            android:id="@+id/chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="36sp"
+            android:textColor="#B64D4D"
+            android:format="%s" />
+
+        <!-- Optional: race name -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputRaceName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Name your race (optional)" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Pause & Stop -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pause"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                app:backgroundTint="#B64D4D"
+                android:textColor="@android:color/white" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stop"
+                android:textAllCaps="false"
+                android:layout_marginStart="12dp"
+                app:cornerRadius="12dp"
+                app:backgroundTint="#B64D4D"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ===== COLLAPSIBLE MENU ===== -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/menuCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:strokeColor="#F3D9C7"
+        app:strokeWidth="1dp"
+        app:layout_constraintBottom_toTopOf="@+id/fabMenu"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <!-- Start Run (opens chooser) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMenuStartRun"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start Run"
+                android:textAllCaps="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:cornerRadius="12dp"
+                app:backgroundTint="#B64D4D"
+                app:icon="@drawable/ic_play_arrow_24"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconTint="@android:color/white"
+                android:textColor="@android:color/white" />
+
+            <!-- Customize Race -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMenuCustomizeRace"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Customize Race"
+                android:textAllCaps="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:cornerRadius="12dp"
+                app:backgroundTint="#B64D4D"
+                app:icon="@drawable/ic_tune_24"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconTint="@android:color/white"
+                android:textColor="@android:color/white" />
+
+            <!-- Profile -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMenuProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Profile"
+                android:textAllCaps="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:cornerRadius="12dp"
+                app:backgroundTint="#B64D4D"
+                app:icon="@drawable/ic_person_24"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconTint="@android:color/white"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- ===== MENU FAB ===== -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Menu"
+        android:textAllCaps="false"
+        app:icon="@drawable/ic_menu_24"
+        app:iconTint="@android:color/white"
+        app:backgroundTint="#B64D4D"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="20dp"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

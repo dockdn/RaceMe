@@ -1,0 +1,75 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.raceme">
+
+    <!-- Location permissions for distance tracking -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <!-- If you later move tracking to a Foreground Service -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+
+    <!-- Internet for Firebase -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- (Optional but recommended) declare GPS hardware -->
+    <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
+
+    <application
+        android:allowBackup="true"
+        android:label="RaceMe"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.RaceMe">
+
+        <!-- Public Tracks list -->
+        <activity
+            android:name=".TracksActivity"
+            android:exported="false" />
+
+        <!-- Run details screen (if you have one) -->
+        <activity
+            android:name=".RunActivity"
+            android:exported="false" />
+
+        <!-- Profile screen -->
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+
+        <!-- Create Race -->
+        <activity
+            android:name=".CreateRaceActivity"
+            android:exported="false" />
+
+        <!-- Quotes & Reports -->
+        <activity
+            android:name=".QuotesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ReportsActivity"
+            android:exported="false" />
+
+        <!-- Start Run (main in-app entry) -->
+        <activity
+            android:name=".StartRunActivity"
+            android:exported="true" />
+
+        <!-- Registration -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="true" />
+
+        <!-- Launcher / Login -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>

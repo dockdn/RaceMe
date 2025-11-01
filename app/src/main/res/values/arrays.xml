@@ -1,0 +1,12 @@
+<resources>
+    <array name="com_google_android_gms_fonts_certs">
+        <item>@array/com_google_android_gms_fonts_certs_dev</item>
+        <item>@array/com_google_android_gms_fonts_certs_prod</item>
+    </array>
+    <array name="com_google_android_gms_fonts_certs_dev">
+        <item>MIID...DEV...CERT...TRUNCATED</item>
+    </array>
+    <array name="com_google_android_gms_fonts_certs_prod">
+        <item>MIID...PROD...CERT...TRUNCATED</item>
+    </array>
+</resources>
