@@ -1,33 +1,17 @@
-📝 README.md
-
-██████╗ █████╗ ██████╗███████╗███╗ ███╗███████╗
-██╔══██╗██╔══██╗██╔════╝██╔════╝████╗ ████║██╔════╝
-██████╔╝███████║██║ █████╗ ██╔████╔██║█████╗
-██╔═══╝ ██╔══██║██║ ██╔══╝ ██║╚██╔╝██║██╔══╝
-██║ ██║ ██║╚██████╗███████╗██║ ╚═╝ ██║███████╗
-╚═╝ ╚═╝ ╚═╝ ╚═════╝╚══════╝╚═╝ ╚═╝╚══════╝
-
-
 # RaceMe 🏃‍♀️
-
 RaceMe is an Android app designed to motivate runners and walkers by tracking their activity and progress over time.
 
+## 🚧 Project Status
+Currently in the early development phase.
+The main focus is on getting the core functionality working — such as activity tracking, user profiles, and data handling.
+Visual design and UI improvements will come later once the essential features are stable.
 
-
-🚧 Project Status: Early Development
-
-
-The current focus is on implementing **core functionality** — including activity tracking, user profiles, and data handling.  
-UI design and visual styling will be introduced in upcoming stages once the main features are stable.
-
----
-
-### 📱 Scope
-- Android (Kotlin)
+## 📱 Scope
+- Built for Android (Kotlin)
 - Firebase backend integration planned
-- Focused on step tracking, progress reports, and motivation features
+- Focused on step tracking, progress reports, and motivational features
 - Future updates will introduce badges, quotes, and community events
 
----
-
-### �### �### �### �### �### �### �### �### �### �### �### �### �### �### �### �### �### �### �### �### �### �### �### �### �#st**, then make it **look amazing later** ✨
+## 💡 Notes
+At this stage, expect basic layouts and placeholder visuals.
+The goal is to get the app running first, and then make it look amazing later ✨
