@@ -8,6 +8,9 @@ import android.os.SystemClock
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.TranslateAnimation
+import android.widget.ArrayAdapter
+import android.widget.RatingBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -23,27 +26,22 @@ class StartRunActivity : BaseActivity() {
     private lateinit var b: ActivityStartRunBinding
     private var menuOpen = false
 
-    // Chronometer state
-    private var isPaused = false
+    private var isPaused = true
     private var pauseOffset: Long = 0L
     private var startedAtMillis: Long? = null
 
-    // Firebase
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }
 
-    // Public race linkage
     private var selectedPublicRaceId: String? = null
+    private var selectedTrackName: String? = null
 
-    // ===== Location tracking =====
     private lateinit var fused: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private var locationCallback: LocationCallback? = null
-
     private var lastFix: Location? = null
     private var distanceMeters: Double = 0.0
 
-    // permission launcher
     private val locationPermLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { grants ->
@@ -55,10 +53,10 @@ class StartRunActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val user = auth.currentUser ?: run { go(LoginActivity::class.java); finish(); return }
         b = ActivityStartRunBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        // init fused location
         fused = LocationServices.getFusedLocationProviderClient(this)
         locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1500L)
             .setMinUpdateIntervalMillis(1000L)
@@ -66,93 +64,36 @@ class StartRunActivity : BaseActivity() {
             .setMinUpdateDistanceMeters(2.0f)
             .build()
 
-        // FAB toggles menu
-        b.fabMenu.setOnClickListener { toggleMenu() }
-
-        // Menu actions
-        b.btnMenuStartRun.setOnClickListener {
-            showStartChooser()
-            toggleMenu(closeOnly = true)
+        val options = listOf("Start a new track", "Browse public tracks…")
+        b.ddTrack.setAdapter(ArrayAdapter(this, android.R.layout.simple_list_item_1, options))
+        b.ddTrack.setOnItemClickListener { _, _, position, _ ->
+            when (position) {
+                0 -> { selectedPublicRaceId = null; selectedTrackName = "New Track"; Toast.makeText(this, "New track selected", Toast.LENGTH_SHORT).show() }
+                1 -> { go(TracksActivity::class.java) }
+            }
         }
-        b.btnMenuCustomizeRace.setOnClickListener {
-            go(CreateRaceActivity::class.java)
-            toggleMenu(closeOnly = true)
-        }
-        b.btnMenuProfile.setOnClickListener {
-            go(ProfileActivity::class.java)
-            toggleMenu(closeOnly = true)
-        }
+        b.ddTrack.setText(options.first(), false); selectedTrackName = "New Track"
 
-        // ON-SCREEN CONTROLS
-        b.btnPause.setOnClickListener { togglePause() }
-        b.btnStop.setOnClickListener { stopRunAndSave() }
-
-        // Reset UI text
+        b.btnPause.setOnClickListener { if (isPaused) startRun() else togglePause() }
+        b.btnStop.setOnClickListener { stopRunShowSummary() }
         b.tvMiles.text = "0.00 mi"
+
+        b.fabMenu.setOnClickListener { toggleMenu() }
+        b.btnMenuStartRun.setOnClickListener { if (isPaused) startRun() else togglePause(); toggleMenu(closeOnly = true) }
+        b.btnMenuCustomizeRace.setOnClickListener { go(CreateRaceActivity::class.java); toggleMenu(closeOnly = true) }
+        b.btnMenuProfile.setOnClickListener { go(ProfileActivity::class.java); toggleMenu(closeOnly = true) }
     }
 
-    // ===== PUBLIC OR NEW ?! =====
-    private fun showStartChooser() {
-        val items = arrayOf("Browse public races", "Start a new race")
-        AlertDialog.Builder(this)
-            .setTitle("How do you want to start?")
-            .setItems(items) { _, which ->
-                when (which) {
-                    0 -> loadAndPickPublicRace()
-                    1 -> { selectedPublicRaceId = null; startRun() }
-                }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun loadAndPickPublicRace() {
-        db.collection("publicRaces")
-            .orderBy("createdAt")
-            .limit(20)
-            .get()
-            .addOnSuccessListener { snap ->
-                if (snap.isEmpty) {
-                    Toast.makeText(this, "No public races yet", Toast.LENGTH_SHORT).show()
-                    return@addOnSuccessListener
-                }
-                val docs = snap.documents
-                val names = docs.map { it.getString("name") ?: "(unnamed race)" }.toTypedArray()
-                AlertDialog.Builder(this)
-                    .setTitle("Choose a public race")
-                    .setItems(names) { _, idx ->
-                        val doc = docs[idx]
-                        selectedPublicRaceId = doc.id
-                        b.inputRaceName.setText(doc.getString("name") ?: "")
-                        startRun()
-                    }
-                    .setNegativeButton("Cancel", null)
-                    .show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, e.message ?: "Failed to load public races", Toast.LENGTH_LONG).show()
-            }
-    }
-
-    // ===== RUN CONTROLS =====
     private fun startRun() {
-        if (b.runControls.visibility != View.VISIBLE) b.runControls.visibility = View.VISIBLE
+        if (auth.currentUser == null) { go(LoginActivity::class.java); finish(); return }
         if (startedAtMillis == null) startedAtMillis = System.currentTimeMillis()
-
-        // RESET NOT PAUSE ...
-        if (pauseOffset == 0L && !isPaused) {
-            distanceMeters = 0.0
-            lastFix = null
-            b.tvMiles.text = "0.00 mi"
+        if (pauseOffset == 0L && isPaused) {
+            distanceMeters = 0.0; lastFix = null; b.tvMiles.text = "0.00 mi"
         }
-
-        // TIMER
         b.chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
         b.chronometer.start()
         isPaused = false
         b.btnPause.text = "Pause"
-
-        // LOCATION
         ensureLocationPermissionThenStart()
         Toast.makeText(this, "Run started!", Toast.LENGTH_SHORT).show()
     }
@@ -168,41 +109,6 @@ class StartRunActivity : BaseActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ))
         }
-    }
-
-    private fun startLocationUpdates() {
-        if (locationCallback != null) return // already running
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-                val fix = result.lastLocation ?: return
-                if (fix.hasAccuracy() && fix.accuracy > 50f) return // ignore bad fixes
-
-                lastFix?.let { prev ->
-                    val delta = prev.distanceTo(fix) // meters
-                    if (delta in 0.5f..100f) {       // discard micro-moves and jumps
-                        distanceMeters += delta
-                        updateMilesLabel()
-                    }
-                }
-                lastFix = fix
-            }
-        }
-        try {
-            fused.requestLocationUpdates(locationRequest, locationCallback as LocationCallback, mainLooper)
-        } catch (_: SecurityException) {
-            Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun stopLocationUpdates() {
-        locationCallback?.let { fused.removeLocationUpdates(it) }
-        locationCallback = null
-    }
-
-    private fun updateMilesLabel() {
-        val miles = distanceMeters / 1609.344
-        val shown = (round(miles * 100.0) / 100.0)
-        b.tvMiles.text = String.format("%.2f mi", shown)
     }
 
     private fun togglePause() {
@@ -221,49 +127,101 @@ class StartRunActivity : BaseActivity() {
         }
     }
 
-    private fun stopRunAndSave() {
-        val uid = auth.currentUser?.uid
-        if (uid == null) {
-            Toast.makeText(this, "Not signed in", Toast.LENGTH_LONG).show()
-            return
+    private fun startLocationUpdates() {
+        if (locationCallback != null) return
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                val fix = result.lastLocation ?: return
+                if (fix.hasAccuracy() && fix.accuracy > 50f) return
+                lastFix?.let { prev ->
+                    val delta = prev.distanceTo(fix)
+                    if (delta in 0.5f..100f) {
+                        distanceMeters += delta
+                        updateMilesLabel()
+                    }
+                }
+                lastFix = fix
+            }
         }
+        try { fused.requestLocationUpdates(locationRequest, locationCallback as LocationCallback, mainLooper) }
+        catch (_: SecurityException) { Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show() }
+    }
 
+    private fun stopLocationUpdates() {
+        locationCallback?.let { fused.removeLocationUpdates(it) }
+        locationCallback = null
+    }
+
+    private fun updateMilesLabel() {
+        val miles = distanceMeters / 1609.344
+        val shown = (round(miles * 100.0) / 100.0)
+        b.tvMiles.text = String.format("%.2f mi", shown)
+    }
+
+    private fun stopRunShowSummary() {
         val endMs = System.currentTimeMillis()
         val startMs = startedAtMillis ?: endMs
         val elapsedMs = SystemClock.elapsedRealtime() - b.chronometer.base
+
         b.chronometer.stop()
         stopLocationUpdates()
+        isPaused = true
+        b.btnPause.text = "Start"
 
-        val name = b.inputRaceName.text?.toString()?.trim().orEmpty()
         val miles = distanceMeters / 1609.344
+        val pace = computePace(elapsedMs, miles)
+
+        val view = layoutInflater.inflate(R.layout.run_summary, null, false)
+        view.findViewById<TextView>(R.id.tvDistance).text = String.format("Distance: %.2f mi", miles)
+        view.findViewById<TextView>(R.id.tvPace).text = "Pace: $pace"
+        val quote = pickQuote()
+        view.findViewById<TextView>(R.id.tvQuote).text = "“$quote”"
+        val ratingBar = view.findViewById<RatingBar>(R.id.ratingBar)
+
+        val dlg = AlertDialog.Builder(this).setView(view).setCancelable(false).create()
+        view.findViewById<View>(R.id.btnCancel).setOnClickListener { dlg.dismiss(); resetRunUI() }
+        view.findViewById<View>(R.id.btnSave).setOnClickListener {
+            val rating = ratingBar.rating.toInt()
+            saveRunToFirestore(startMs, endMs, elapsedMs, miles, pace, quote, rating)
+            dlg.dismiss()
+        }
+        dlg.show()
+    }
+
+    private fun saveRunToFirestore(
+        startMs: Long,
+        endMs: Long,
+        elapsedMs: Long,
+        miles: Double,
+        pace: String,
+        quote: String,
+        rating: Int
+    ) {
+        val uid = auth.currentUser?.uid ?: run { go(LoginActivity::class.java); finish(); return }
+        val friendlyName = selectedTrackName ?: "Run " +
+        java.text.SimpleDateFormat("M/d h:mma", java.util.Locale.US).format(java.util.Date(startMs))
 
         val runDoc = hashMapOf(
-            "name" to name,
+            "name" to friendlyName,
             "elapsedMs" to elapsedMs,
             "distanceMeters" to distanceMeters,
             "distanceMiles" to miles,
+            "paceMinPerMile" to pace,
+            "quote" to quote,
+            "rating" to rating,
             "startedAt" to Timestamp(startMs / 1000, ((startMs % 1000) * 1_000_000).toInt()),
             "endedAt" to Timestamp(endMs / 1000, ((endMs % 1000) * 1_000_000).toInt()),
             "createdAt" to Timestamp.now(),
             "device" to android.os.Build.MODEL,
             "sdkInt" to android.os.Build.VERSION.SDK_INT,
-            "appVersion" to runCatching {
-                packageManager.getPackageInfo(packageName, 0).versionName ?: "1.0"
-            }.getOrElse { "1.0" }
-        ).apply {
-            selectedPublicRaceId?.let { put("publicRaceId", it) }
-        }
+            "publicRaceId" to selectedPublicRaceId
+        )
 
         db.collection("users").document(uid)
             .collection("runs")
             .add(runDoc)
             .addOnSuccessListener {
-                val pretty = formatElapsed(elapsedMs)
-                Toast.makeText(
-                    this,
-                    "Saved ${if (name.isNotEmpty()) "“$name” " else ""}– $pretty, ${String.format("%.2f", miles)} mi",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(this, "Saved – %.2f mi @ %s".format(miles, pace), Toast.LENGTH_LONG).show()
                 resetRunUI()
             }
             .addOnFailureListener { e ->
@@ -271,32 +229,41 @@ class StartRunActivity : BaseActivity() {
             }
     }
 
+    private fun computePace(elapsedMs: Long, miles: Double): String {
+        if (miles <= 0.0) return "--:-- / mi"
+        val totalSec = (elapsedMs / 1000.0) / miles
+        val m = totalSec.toInt() / 60
+        val s = (totalSec % 60).toInt()
+        return "%d:%02d / mi".format(m, s)
+    }
+
+    private fun pickQuote(): String {
+        val quotes = listOf(
+            "Small steps win races.",
+            "You’re lapping everyone still on the couch.",
+            "One more mile, one more smile.",
+            "Consistency beats intensity.",
+            "Run the day, don’t let it run you.",
+            "Progress > perfection."
+        )
+        return quotes.random()
+    }
+
     private fun resetRunUI() {
         pauseOffset = 0L
-        isPaused = false
+        isPaused = true
         startedAtMillis = null
         lastFix = null
         distanceMeters = 0.0
-        b.btnPause.text = "Pause"
+        b.btnPause.text = "Start"
         b.chronometer.base = SystemClock.elapsedRealtime()
-        b.inputRaceName.setText("")
         b.tvMiles.text = "0.00 mi"
-        // keep or hide controls as you prefer
-        // b.runControls.visibility = View.GONE
-    }
-
-    private fun formatElapsed(ms: Long): String {
-        val totalSec = ms / 1000
-        val h = totalSec / 3600
-        val m = (totalSec % 3600) / 60
-        val s = totalSec % 60
-        return if (h > 0) "%d:%02d:%02d".format(h, m, s) else "%02d:%02d".format(m, s)
     }
 
     private fun toggleMenu(closeOnly: Boolean = false) {
         if (menuOpen || closeOnly) {
             val slideOut = TranslateAnimation(0f, 0f, 0f, 40f).apply { duration = 140 }
-            val fadeOut = AlphaAnimation(1f, 0f).apply { duration = 140 }
+            val fadeOut  = AlphaAnimation(1f, 0f).apply { duration = 140 }
             b.menuCard.startAnimation(slideOut)
             b.menuCard.startAnimation(fadeOut)
             b.menuCard.visibility = View.GONE
@@ -305,7 +272,7 @@ class StartRunActivity : BaseActivity() {
         } else {
             b.menuCard.visibility = View.VISIBLE
             val slideIn = TranslateAnimation(0f, 0f, 40f, 0f).apply { duration = 140 }
-            val fadeIn = AlphaAnimation(0f, 1f).apply { duration = 140 }
+            val fadeIn  = AlphaAnimation(0f, 1f).apply { duration = 140 }
             b.menuCard.startAnimation(slideIn)
             b.menuCard.startAnimation(fadeIn)
             b.fabMenu.extend()
@@ -315,12 +282,12 @@ class StartRunActivity : BaseActivity() {
 
     override fun onPause() {
         super.onPause()
-        // For true background tracking, move updates to a Foreground Service.
         if (!isPaused) stopLocationUpdates()
     }
 
     override fun onResume() {
         super.onResume()
+        if (FirebaseAuth.getInstance().currentUser == null) { go(LoginActivity::class.java); finish(); return }
         if (!isPaused && startedAtMillis != null) ensureLocationPermissionThenStart()
     }
 }

@@ -12,9 +12,9 @@ class LoginActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // If already logged in, go straight to Start Run screen
+        // ✅ If user already logged in, go straight to HOME
         auth.currentUser?.let {
-            go(StartRunActivity::class.java)
+            go(HomeActivity::class.java)
             finish()
             return
         }
@@ -22,9 +22,11 @@ class LoginActivity : BaseActivity() {
         b = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(b.root)
 
+        // ✅ LOGIN BUTTON
         b.btnLogin.setOnClickListener {
             val email = b.inputEmail.text.toString().trim()
             val pw = b.inputPassword.text.toString()
+
             if (email.isEmpty() || pw.isEmpty()) {
                 Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -34,7 +36,7 @@ class LoginActivity : BaseActivity() {
             auth.signInWithEmailAndPassword(email, pw).addOnCompleteListener { task ->
                 b.btnLogin.isEnabled = true
                 if (task.isSuccessful) {
-                    go(StartRunActivity::class.java)
+                    go(HomeActivity::class.java)  // ✅ go to Home, not StartRun
                     finish()
                 } else {
                     Toast.makeText(
@@ -46,6 +48,9 @@ class LoginActivity : BaseActivity() {
             }
         }
 
-        b.linkRegister.setOnClickListener { go(RegisterActivity::class.java) }
+        // ✅ REGISTER LINK (goes to RegisterActivity)
+        b.linkRegister.setOnClickListener {
+            go(RegisterActivity::class.java)
+        }
     }
 }

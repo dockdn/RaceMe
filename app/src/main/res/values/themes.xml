@@ -1,24 +1,73 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-<style name="Theme.RaceMe" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-    <!-- Primary brand colors -->
-    <item name="colorPrimary">#B64D4D</item> <!-- dusty red -->
-    <item name="colorPrimaryVariant">#8B3E3E</item>
-    <item name="colorOnPrimary">#FFFFFF</item>
 
-    <!-- Secondary -->
-    <item name="colorSecondary">#FFE5CC</item> <!-- creamy -->
-    <item name="colorSecondaryVariant">#F5D1B5</item>
-    <item name="colorOnSecondary">#000000</item>
+    <!-- App theme -->
+    <style name="Theme.RaceMe" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Brand colors -->
+        <item name="colorPrimary">#B64D4D</item>
+        <item name="colorPrimaryVariant">#8B3E3E</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
 
-    <!-- Background -->
-    <item name="android:colorBackground">#FFF8F2</item>
-    <item name="colorSurface">#FFF8F2</item>
-    <item name="colorOnSurface">#2D2D2D</item>
+        <item name="colorSecondary">#FFE5CC</item>
+        <item name="colorSecondaryVariant">#F5D1B5</item>
+        <item name="colorOnSecondary">#000000</item>
 
-    <!-- Disable dynamic colors -->
-    <item name="dynamicColorThemeOverlay">@null</item>
+        <!-- Surfaces / background -->
+        <item name="android:colorBackground">#FFF8F2</item>
+        <item name="colorSurface">#FFF8F2</item>
+        <item name="colorOnSurface">#2D2D2D</item>
 
-    <!-- Use MaterialComponents widgets -->
-    <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button</item>
-</style>
+        <!-- Make VT323 the default font -->
+        <item name="android:fontFamily">@font/vt323</item>
+        <item name="fontFamily">@font/vt323</item>
+
+        <!-- Buttons use our custom style -->
+        <item name="materialButtonStyle">@style/Widget.RaceMe.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.RaceMe.OutlinedButton</item>
+
+        <item name="dynamicColorThemeOverlay" tools:ignore="NewApi">@null</item>
+
+        <!-- Status/navigation bars -->
+        <item name="android:statusBarColor" tools:targetApi="l">#8B3E3E</item>
+        <item name="android:navigationBarColor" tools:targetApi="l">#FFF8F2</item>
+    </style>
+
+    <!-- Buttons: larger text, rounder corners -->
+    <style name="Widget.RaceMe.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:fontFamily">@font/vt323</item>
+        <item name="fontFamily">@font/vt323</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">20dp</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:minHeight">54dp</item>
+        <item name="rippleColor">?attr/colorSecondaryVariant</item>
+    </style>
+
+    <!-- Outlined button -->
+    <style name="Widget.RaceMe.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:fontFamily">@font/vt323</item>
+        <item name="fontFamily">@font/vt323</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">20dp</item>
+        <item name="android:textSize">22sp</item>
+        <item name="strokeColor">?attr/colorPrimary</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <!-- Headings: slightly larger and bold -->
+    <style name="TextAppearance.RaceMe.Headline" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:fontFamily">@font/vt323</item>
+        <item name="fontFamily">@font/vt323</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">#B64D4D</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Body text: readable size -->
+    <style name="TextAppearance.RaceMe.Body" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:fontFamily">@font/vt323</item>
+        <item name="fontFamily">@font/vt323</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#2D2D2D</item>
+    </style>
+
 </resources>
