@@ -35,6 +35,7 @@ class HomeActivity : BaseActivity() {
         b.btnReminder?.setOnClickListener { go(RemindersActivity::class.java) }
     }
 
+
     override fun onResume() {
         super.onResume()
         if (FirebaseAuth.getInstance().currentUser == null) { go(LoginActivity::class.java); finish() }

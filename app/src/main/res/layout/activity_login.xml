@@ -1,53 +1,132 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/cream"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFF8F2"
+    android:padding="24dp">
 
-    <LinearLayout
-        android:padding="24dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    <!-- Main Login Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardLogin"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:cardCornerRadius="22dp"
+        app:strokeColor="#F3D9C7"
+        app:strokeWidth="1dp"
+        app:cardElevation="4dp"
+        android:backgroundTint="#FFFFFF"
+        android:padding="28dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="LOGIN AND REGISTRATION"
-            android:textSize="28sp"
-            android:textColor="@color/dusty_red"
-            android:textStyle="bold"/>
-
-        <EditText
-            android:id="@+id/inputEmail"
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="top|center_horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
-            android:layout_marginTop="24dp"/>
+            android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/inputPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:layout_marginTop="12dp"/>
+            <!-- Header -->
+            <TextView
+                android:text="RaceMe"
+                android:textColor="#B64D4D"
+                android:textSize="36sp"
+                android:fontFamily="@font/vt323"
+                android:textStyle="bold"
+                android:layout_marginBottom="6dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="LOGIN"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="@color/dusty_red"
-            android:textColor="@color/cream"/>
+            <TextView
+                android:text="Welcome back 🏁"
+                android:textColor="#6B6B6B"
+                android:textSize="16sp"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/vt323"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/linkRegister"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Create an account"
-            android:textColor="@color/dusty_red"
-            android:layout_marginTop="16dp"/>
-    </LinearLayout>
-</ScrollView>
+            <!-- Email Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Email"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="#B64D4D"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputEmail"
+                    android:inputType="textEmailAddress"
+                    android:fontFamily="@font/vt323"
+                    android:textColor="#2D2D2D"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Password Field (no toggle) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="Password"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="#B64D4D"
+                app:passwordToggleEnabled="false"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputPassword"
+                    android:inputType="textPassword"
+                    android:fontFamily="@font/vt323"
+                    android:textColor="#2D2D2D"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Login Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sign in"
+                android:textAllCaps="false"
+                android:layout_marginTop="20dp"
+                android:textColor="@android:color/white"
+                app:cornerRadius="14dp"
+                android:fontFamily="@font/vt323"
+                app:backgroundTint="#B64D4D" />
+
+            <!-- Register Link -->
+            <TextView
+                android:id="@+id/linkRegister"
+                android:text="New here? Create an account →"
+                android:textColor="#B64D4D"
+                android:textSize="14sp"
+                android:fontFamily="@font/vt323"
+                android:gravity="center"
+                android:layout_marginTop="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Footer Quote -->
+            <TextView
+                android:text="“Stay consistent. Small steps win races.”"
+                android:textColor="#7A7A7A"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:layout_marginTop="18dp"
+                android:fontFamily="@font/vt323"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -25,4 +25,8 @@
         <color name="rm_time">#7FA2F4</color>
 
 
+    <color name="black">#000000</color>
+    <color name="darker_gray">#666666</color>
+
+
 </resources>

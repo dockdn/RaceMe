@@ -4,11 +4,13 @@
     android:layout_height="match_parent"
     android:background="#FFF8F2">
 
+    <!-- Content container -->
     <LinearLayout
         android:orientation="vertical"
         android:padding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF">
 
         <!-- Header -->
         <TextView
@@ -19,7 +21,7 @@
             android:textSize="22sp"
             android:textStyle="bold"
             android:fontFamily="@font/vt323"
-            android:textColor="#2D2D2D"
+            android:textColor="#B64D4D"
             android:layout_marginBottom="4dp" />
 
         <TextView
@@ -28,7 +30,7 @@
             android:layout_height="wrap_content"
             android:text="0.00 mi • 0 min • 0 runs"
             android:textSize="16sp"
-            android:textColor="#555555"
+            android:textColor="#8B3E3E"
             android:layout_marginBottom="12dp" />
 
         <!-- Range toggle -->
@@ -44,6 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Weekly"
+                android:textColor="#2D2D2D"
                 android:checked="true" />
 
             <RadioButton
@@ -51,6 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Monthly"
+                android:textColor="#2D2D2D"
                 android:layout_marginStart="16dp" />
         </RadioGroup>
 
@@ -62,16 +66,20 @@
             android:text="No data yet — start a run!"
             android:textAlignment="center"
             android:textSize="16sp"
-            android:textColor="#8B3E3E"
+            android:textColor="#B64D4D"
             android:padding="16dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:background="#FFE5CC"
+            android:layout_marginBottom="8dp" />
 
         <!-- Miles chart -->
         <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/chartMiles"
             android:layout_width="match_parent"
             android:layout_height="220dp"
-            android:layout_marginTop="12dp" />
+            android:layout_marginTop="12dp"
+            android:background="#FFF2ED"
+            android:padding="4dp" />
 
         <!-- Time chart -->
         <com.github.mikephil.charting.charts.BarChart
@@ -79,7 +87,9 @@
             android:layout_width="match_parent"
             android:layout_height="220dp"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:background="#FFF2ED"
+            android:padding="4dp" />
 
     </LinearLayout>
 </ScrollView>

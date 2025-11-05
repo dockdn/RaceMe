@@ -4,34 +4,77 @@ import android.os.Bundle
 import android.widget.Toast
 import com.example.raceme.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.userProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterActivity : BaseActivity() {
     private lateinit var b: ActivityRegisterBinding
     private val auth by lazy { FirebaseAuth.getInstance() }
+    private val db by lazy { FirebaseFirestore.getInstance() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        b.btnCreate.setOnClickListener {
-            val email = b.inputRegEmail.text.toString().trim()
-            val pw = b.inputRegPassword.text.toString()
-            val name = b.inputName.text.toString().trim()
+        b.btnCreateAccount.setOnClickListener {
+            val name = b.inputName.text?.toString()?.trim().orEmpty()
+            val email = b.inputEmail.text?.toString()?.trim().orEmpty()
+            val pw = b.inputPassword.text?.toString().orEmpty()
+            val confirm = b.inputConfirm.text?.toString().orEmpty()
+
             if (email.isEmpty() || pw.isEmpty()) {
-                Toast.makeText(this, "Email and password are required", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                toast("Email and password are required"); return@setOnClickListener
             }
-            b.btnCreate.isEnabled = false
-            auth.createUserWithEmailAndPassword(email, pw).addOnCompleteListener { task ->
-                b.btnCreate.isEnabled = true
-                if (task.isSuccessful) {
-                    Toast.makeText(this, "Account created. You can login now.", Toast.LENGTH_SHORT).show()
-                    finish()
-                } else {
-                    Toast.makeText(this, task.exception?.message ?: "Registration failed", Toast.LENGTH_LONG).show()
+            if (confirm.isNotEmpty() && pw != confirm) {
+                toast("Passwords don’t match"); return@setOnClickListener
+            }
+
+            b.btnCreateAccount.isEnabled = false
+
+            auth.createUserWithEmailAndPassword(email, pw)
+                .addOnSuccessListener { result ->
+                    val user = result.user
+                    if (user == null) {
+                        b.btnCreateAccount.isEnabled = true
+                        toast("Account created, but no user returned"); return@addOnSuccessListener
+                    }
+
+                    // Update display name (if provided)
+                    if (name.isNotEmpty()) {
+                        val profile = userProfileChangeRequest { displayName = name }
+                        user.updateProfile(profile)
+                            .addOnFailureListener { /* non-fatal */ }
+                    }
+
+                    // Create / update Firestore user doc
+                    val doc = mapOf(
+                        "displayName" to (name.ifEmpty { null }),
+                        "email" to email,
+                        "createdAt" to com.google.firebase.Timestamp.now()
+                    )
+
+                    db.collection("users").document(user.uid).set(doc)
+                        .addOnCompleteListener {
+                            b.btnCreateAccount.isEnabled = true
+                            toast("Account created! Welcome 🎉")
+                            // Go straight to Home
+                            go(HomeActivity::class.java)
+                            finishAffinity()
+                        }
                 }
-            }
+                .addOnFailureListener { e ->
+                    b.btnCreateAccount.isEnabled = true
+                    toast(e.message ?: "Registration failed")
+                }
+        }
+
+        b.linkLogin.setOnClickListener {
+            go(LoginActivity::class.java)
+            finish()
         }
     }
+
+    private fun toast(msg: String) =
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 }
