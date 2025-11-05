@@ -1,19 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.raceme">
 
-    <!-- Location permissions for distance tracking -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-
-    <!-- If you later move tracking to a Foreground Service -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
-
-    <!-- Internet for Firebase -->
+    <!-- Network (Firebase/Auth/Firestore) -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- (Optional but recommended) declare GPS hardware -->
+    <!-- Location (StartRunActivity tracking) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
+
+    <!-- Notifications (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -23,45 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RaceMe">
 
-        <!-- Public Tracks list -->
-        <activity
-            android:name=".TracksActivity"
-            android:exported="false" />
-
-        <!-- Run details screen (if you have one) -->
-        <activity
-            android:name=".RunActivity"
-            android:exported="false" />
-
-        <!-- Profile screen -->
-        <activity
-            android:name=".ProfileActivity"
-            android:exported="false" />
-
-        <!-- Create Race -->
-        <activity
-            android:name=".CreateRaceActivity"
-            android:exported="false" />
-
-        <!-- Quotes & Reports -->
-        <activity
-            android:name=".QuotesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ReportsActivity"
-            android:exported="false" />
-
-        <!-- Start Run (main in-app entry) -->
-        <activity
-            android:name=".StartRunActivity"
-            android:exported="true" />
-
-        <!-- Registration -->
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="true" />
-
-        <!-- Launcher / Login -->
+        <!-- ===========================
+             NORMAL MODE (Login first)
+             =========================== -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -71,5 +33,43 @@
             </intent-filter>
         </activity>
 
+        <!-- (Optional) PRESENTATION MODE: launch straight to Home
+             To use, comment out the LoginActivity block above and uncomment below. -->
+        <!--
+        <activity
+            android:name=".HomeActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        -->
+
+        <!-- Reminders screen -->
+        <activity android:name=".RemindersActivity" />
+
+        <!-- Alarm receiver for reminders -->
+        <receiver
+            android:name=".ReminderReceiver"
+            android:exported="false" />
+
+        <!-- Other activities (no intent-filters; exported not required) -->
+        <activity android:name=".HomeActivity" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".ProfileActivity" />
+        <activity android:name=".StartRunActivity" />
+        <activity android:name=".CreateRaceActivity" />
+        <activity android:name=".ChallengesActivity" />
+        <activity android:name=".ReportsActivity" />
+        <activity android:name=".BadgesActivity" />
+        <activity android:name=".TracksActivity" />
+        <activity android:name=".QuotesActivity" />
+        <activity android:name=".RunsActivity" />
+
+        <!-- Google Play Services version -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 </manifest>

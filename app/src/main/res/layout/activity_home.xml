@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:background="#FFF8F2"
+    tools:context=".HomeActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
+
+        <!-- Title & Greeting -->
+        <TextView
+            android:id="@+id/tvGreeting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome back, Racer!"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/vt323"
+            android:textColor="#B64D4D"
+            android:layout_marginBottom="6dp"/>
+
+        <TextView
+            android:id="@+id/tvSub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stay consistent. Small steps win races."
+            android:textSize="18sp"
+            android:textColor="#444444"
+            android:fontFamily="@font/vt323"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"/>
+
+        <!-- Buttons Section -->
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="🏁 Start Run"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:fontFamily="@font/vt323"
+            android:backgroundTint="#B64D4D"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/btnCreate"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="✨ Create Race"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:fontFamily="@font/vt323"
+            android:backgroundTint="#B64D4D"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/btnReports"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="📊 Reports"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:fontFamily="@font/vt323"
+            android:backgroundTint="#B64D4D"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/btnChallenges"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="🔥 Challenges"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:fontFamily="@font/vt323"
+            android:backgroundTint="#B64D4D"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/btnBadges"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="🏅 Badges"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:fontFamily="@font/vt323"
+            android:backgroundTint="#B64D4D"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/btnEditProfile"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="👤 Edit Profile"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:fontFamily="@font/vt323"
+            android:backgroundTint="#B64D4D"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/btnQuotes"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="💬 Motivation Quotes"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:fontFamily="@font/vt323"
+            android:backgroundTint="#B64D4D"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/btnReminder"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="⏰ Set Reminder"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:fontFamily="@font/vt323"
+            android:backgroundTint="#B64D4D"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/btnMyRuns"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="🗂️  My Runs and Ratings"
+            android:background="@drawable/retro_button_bg"
+            android:textColor="@color/white"
+            android:layout_marginBottom="10dp"/>
+
+
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="🚪 Logout"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:fontFamily="@font/vt323"
+            android:backgroundTint="#8B3E3E"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="20dp"/>
+    </LinearLayout>
+</ScrollView>

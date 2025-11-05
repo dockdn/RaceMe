@@ -2,22 +2,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="#FFF8F2"
+    android:background="#FFFFFF"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <EditText
         android:id="@+id/inputSearch"
         android:hint="Search public tracks…"
         android:singleLine="true"
         android:padding="12dp"
-        android:background="@drawable/retro_bar_bg"
-        android:layout_marginBottom="12dp"
+        android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTracks"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="300dp"
+        android:layout_marginTop="12dp"/>
+
+    <Button
+        android:id="@+id/btnClose"
+        android:text="Close"
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"/>
 </LinearLayout>

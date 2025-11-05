@@ -3,4 +3,26 @@
     <color name="cream">#FFF6EE</color>
     <color name="charcoal">#222222</color>
     <color name="white">#FFFFFF</color>
+
+    <color name="badge_yellow">#F8E5A7</color>
+    <color name="badge_blue">#7AB8E1</color>
+    <color name="badge_orange">#F4B383</color>
+    <color name="badge_green">#B6D7A8</color>
+    <color name="badge_purple">#C8A2C8</color>
+    <color name="badge_gray">#D3CFCF</color>
+
+        <!-- Brand-ish palette -->
+        <color name="rm_primary">#B64D4D</color>
+        <color name="rm_primaryDark">#8F3E3E</color>
+        <color name="rm_bg">#FFF8F2</color>
+        <color name="rm_card">#FFFFFF</color>
+        <color name="rm_text">#333333</color>
+        <color name="rm_subtext">#777777</color>
+        <color name="rm_stroke">#F1E4DA</color>
+
+        <!-- Chart colors -->
+        <color name="rm_miles">#5AB7AE</color>
+        <color name="rm_time">#7FA2F4</color>
+
+
 </resources>

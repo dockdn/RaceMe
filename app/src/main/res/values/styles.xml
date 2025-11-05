@@ -7,4 +7,10 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <!-- Circle mask for ShapeableImageView -->
+    <style name="ShapeAppearanceOverlay.RaceMe.Circle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
 </resources>
