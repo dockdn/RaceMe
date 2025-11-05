@@ -3,8 +3,8 @@ package com.example.raceme
 import android.os.Bundle
 import android.widget.Toast
 import com.example.raceme.databinding.ActivityCreateRaceBinding
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 class CreateRaceActivity : BaseActivity() {
@@ -39,26 +39,44 @@ class CreateRaceActivity : BaseActivity() {
         val desc = b.inputDescription.text?.toString()?.trim().orEmpty()
         val makePublic = b.switchPublic.isChecked
 
-        val raceDoc = hashMapOf(
-            "name" to name,
-            "description" to desc,
-            "createdBy" to uid,
-            "createdAt" to Timestamp.now()
-        )
-
-        // Save creator's copy (optional)
-        db.collection("users").document(uid)
-            .collection("myRaces")
-            .add(raceDoc)
-
-        if (makePublic) {
-            db.collection("publicRaces")
-                .add(raceDoc)
-                .addOnSuccessListener { Toast.makeText(this, "Published publicly", Toast.LENGTH_SHORT).show() }
-                .addOnFailureListener { e -> Toast.makeText(this, e.message ?: "Failed to publish", Toast.LENGTH_LONG).show() }
+        if (name.isEmpty()) {
+            Toast.makeText(this, "Please enter a race name", Toast.LENGTH_SHORT).show()
+            return
         }
 
-        Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
-        finish()
+        // base doc used for both private + public
+        val baseDoc = hashMapOf(
+            "name" to name,
+            "description" to desc,
+            "ownerId" to uid,
+            // public collection expects this exact field for rules
+            "visibility" to if (makePublic) "public" else "private",
+            // server timestamp so ordering works + rules accept timestamp
+            "createdAt" to FieldValue.serverTimestamp()
+        )
+
+        // Save creator's private copy (optional)
+        db.collection("users").document(uid)
+            .collection("myRaces")
+            .add(baseDoc)
+            .addOnFailureListener { e ->
+                Toast.makeText(this, e.message ?: "Failed to save to My Races", Toast.LENGTH_LONG).show()
+            }
+
+        if (makePublic) {
+            // Must use the collection and fields your rules allow
+            db.collection("public_races")
+                .add(baseDoc)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Published publicly", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, e.message ?: "Failed to publish", Toast.LENGTH_LONG).show()
+                }
+        } else {
+            Toast.makeText(this, "Saved (private)", Toast.LENGTH_SHORT).show()
+            finish()
+        }
     }
 }
