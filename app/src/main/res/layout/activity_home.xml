@@ -49,18 +49,6 @@
             android:textColor="#FFFFFF"
             android:layout_marginBottom="10dp"/>
 
-<!--        <Button-->
-<!--            android:id="@+id/btnCreate"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="56dp"-->
-<!--            android:text="✨ Create Race"-->
-<!--            android:textAllCaps="false"-->
-<!--            android:textSize="20sp"-->
-<!--            android:fontFamily="@font/vt323"-->
-<!--            android:backgroundTint="#B64D4D"-->
-<!--            android:textColor="#FFFFFF"-->
-<!--            android:layout_marginBottom="10dp"/>-->
-
         <Button
             android:id="@+id/btnReports"
             android:layout_width="match_parent"
@@ -142,6 +130,31 @@
             android:textColor="@color/white"
             android:layout_marginBottom="10dp"/>
 
+        <!-- 🆕 Community Feed -->
+        <Button
+            android:id="@+id/btnFeed"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="📰 Community Feed"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:fontFamily="@font/vt323"
+            android:backgroundTint="#B64D4D"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp"/>
+
+        <!-- New Post -->
+        <Button
+            android:id="@+id/btnNewPost"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="➕ New Post"
+            android:textAllCaps="false"
+            android:textSize="20sp"
+            android:fontFamily="@font/vt323"
+            android:backgroundTint="#B64D4D"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp"/>
 
         <Button
             android:id="@+id/btnLogout"

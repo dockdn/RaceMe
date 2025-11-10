@@ -54,6 +54,9 @@
             android:name=".ReminderReceiver"
             android:exported="false" />
 
+        <activity android:name=".FeedActivity" />
+        <activity android:name=".NewPostActivity" />
+
         <!-- Other activities (no intent-filters; exported not required) -->
         <activity android:name=".HomeActivity" />
         <activity android:name=".RegisterActivity" />
