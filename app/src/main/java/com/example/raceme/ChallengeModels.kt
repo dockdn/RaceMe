@@ -4,16 +4,16 @@ data class ChallengeDef(
     val id: String,
     val title: String,
     val desc: String,
-    val distanceMiles: Double? = null, // for distance targets
-    val days: Int? = null,             // for streaks
-    val weekends: Int? = null          // for weekend counts
+    val distanceMiles: Double? = null,
+    val days: Int? = null,
+    val weekends: Int? = null
 )
 
 data class ChallengeRow(
     val def: ChallengeDef,
-    val progressLabel: String, // e.g. "3/7 days", "2.8/3.1 mi"
-    val subLabel: String,      // e.g. "Last 7 days"
-    val progressPercent: Int,  // 0..100
+    val progressLabel: String,
+    val subLabel: String,
+    val progressPercent: Int,
     val earned: Boolean
 )
 

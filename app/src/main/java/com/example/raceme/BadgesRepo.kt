@@ -1,4 +1,3 @@
-// app/src/main/java/com/example/raceme/ui/badges/BadgeRepo.kt
 package com.example.raceme.ui.badges
 
 import com.example.raceme.R

@@ -4,10 +4,10 @@ data class BadgeDef(
     val id: String,
     val title: String,
     val desc: String,
-    val emoji: String,            // e.g. "🏁"
-    val condition: String,        // e.g. "first_run", "distance_once", "early_bird", "streak7"
-    val distanceMiles: Double? = null, // used when condition == "distance_once"
-    val beforeHour: Int? = null        // used when condition == "early_bird"
+    val emoji: String,
+    val condition: String,
+    val distanceMiles: Double? = null,
+    val beforeHour: Int? = null
 )
 
 data class BadgeRow(

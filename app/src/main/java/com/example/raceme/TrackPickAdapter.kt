@@ -17,7 +17,7 @@ class TrackPickAdapter(
 
     fun setItems(items: List<Track>) {
         all.clear(); all.addAll(items)
-        filter("") // show all initially
+        filter("")
     }
 
     fun filter(query: String) {

@@ -37,7 +37,6 @@ class RemindersActivity : BaseActivity() {
 
         ensureNotificationPermission()
 
-        // restore saved selection
         val prefs = getSharedPreferences("reminders", Context.MODE_PRIVATE)
         val daily = prefs.getBoolean("daily", true)
         val hour = prefs.getInt("hour", 7)
@@ -117,7 +116,6 @@ class RemindersActivity : BaseActivity() {
         }
 
         if (daily) {
-            // Inexact repeating is fine for reminders (battery-friendly)
             am.setInexactRepeating(
                 AlarmManager.RTC_WAKEUP,
                 cal.timeInMillis,
@@ -125,7 +123,6 @@ class RemindersActivity : BaseActivity() {
                 pi
             )
         } else {
-            // Weekly (7 days)
             am.setInexactRepeating(
                 AlarmManager.RTC_WAKEUP,
                 cal.timeInMillis,

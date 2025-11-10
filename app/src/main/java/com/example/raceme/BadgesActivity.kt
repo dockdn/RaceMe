@@ -66,7 +66,7 @@ class BadgesActivity : AppCompatActivity() {
         val earnedEarly = runs.any { Instant.ofEpochMilli(it.startedAtMs).atZone(tz).hour < 6 }
 
         val today = LocalDate.now(tz)
-        val cutoff = today.minusDays(9) // last 10 days window
+        val cutoff = today.minusDays(9)
         val distinctRecent = dates.count { !it.isBefore(cutoff) }
         val earnedStreak = distinctRecent >= 7
 

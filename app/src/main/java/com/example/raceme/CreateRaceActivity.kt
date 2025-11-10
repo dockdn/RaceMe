@@ -44,18 +44,14 @@ class CreateRaceActivity : BaseActivity() {
             return
         }
 
-        // base doc used for both private + public
         val baseDoc = hashMapOf(
             "name" to name,
             "description" to desc,
             "ownerId" to uid,
-            // public collection expects this exact field for rules
             "visibility" to if (makePublic) "public" else "private",
-            // server timestamp so ordering works + rules accept timestamp
             "createdAt" to FieldValue.serverTimestamp()
         )
 
-        // Save creator's private copy (optional)
         db.collection("users").document(uid)
             .collection("myRaces")
             .add(baseDoc)
@@ -64,7 +60,6 @@ class CreateRaceActivity : BaseActivity() {
             }
 
         if (makePublic) {
-            // Must use the collection and fields your rules allow
             db.collection("public_races")
                 .add(baseDoc)
                 .addOnSuccessListener {

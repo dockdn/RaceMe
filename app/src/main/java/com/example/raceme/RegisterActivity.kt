@@ -40,14 +40,13 @@ class RegisterActivity : BaseActivity() {
                         toast("Account created, but no user returned"); return@addOnSuccessListener
                     }
 
-                    // Update display name (if provided)
+                    // UPDATE DISPLAY NAME (WHEN CHANGED)
                     if (name.isNotEmpty()) {
                         val profile = userProfileChangeRequest { displayName = name }
                         user.updateProfile(profile)
                             .addOnFailureListener { /* non-fatal */ }
                     }
 
-                    // Create / update Firestore user doc
                     val doc = mapOf(
                         "displayName" to (name.ifEmpty { null }),
                         "email" to email,
@@ -58,7 +57,6 @@ class RegisterActivity : BaseActivity() {
                         .addOnCompleteListener {
                             b.btnCreateAccount.isEnabled = true
                             toast("Account created! Welcome 🎉")
-                            // Go straight to Home
                             go(HomeActivity::class.java)
                             finishAffinity()
                         }

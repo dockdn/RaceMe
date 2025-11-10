@@ -27,7 +27,6 @@ class ChallengesActivity : BaseActivity() {
         b.rvChallenges.layoutManager = LinearLayoutManager(this)
         b.rvChallenges.adapter = adapter
 
-        // Show placeholder rows right away
         adapter.submit(ChallengeCatalog.defs.map { def ->
             ChallengeRow(
                 def = def,
@@ -59,7 +58,6 @@ class ChallengesActivity : BaseActivity() {
             return
         }
 
-        // Last 60 days is enough for our sample challenges
         val endCal = Calendar.getInstance()
         val startCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -60) }
         val startTs = Timestamp(startCal.timeInMillis / 1000, 0)
@@ -95,8 +93,6 @@ class ChallengesActivity : BaseActivity() {
             }
     }
 
-    // ---------- calculations using real run data ----------
-
     private fun computeRun5k(def: ChallengeDef, runs: List<RunRow>): ChallengeRow {
         val target = def.distanceMiles ?: 3.10
         val best = runs.maxOfOrNull { it.miles } ?: 0.0
@@ -108,7 +104,7 @@ class ChallengesActivity : BaseActivity() {
     private fun computeStreak7(def: ChallengeDef, runs: List<RunRow>): ChallengeRow {
         val cal = Calendar.getInstance()
         val end = cal.time
-        cal.add(Calendar.DAY_OF_YEAR, -6) // include today -> 7 days window
+        cal.add(Calendar.DAY_OF_YEAR, -6)
         val start = cal.time
 
         val uniqueDays = runs.filter { it.date in start..end }
@@ -153,7 +149,6 @@ class ChallengesActivity : BaseActivity() {
         return ChallengeRow(def, progress, "Last 30 days", pct, earned = totalMiles >= target - 1e-6)
     }
 
-    // ---------- helpers ----------
     private fun isWeekend(date: Date): Boolean {
         val c = Calendar.getInstance().apply { time = date }
         val dow = c.get(Calendar.DAY_OF_WEEK)

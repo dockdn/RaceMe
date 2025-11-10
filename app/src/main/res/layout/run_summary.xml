@@ -1,88 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="20dp"
-    android:background="#FFFFFF"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/tvTitle"
-        android:text="Run Summary"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="#B64D4D"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/tvDistance"
-        android:text="Distance: 0.00 mi"
-        android:textSize="16sp"
-        android:textColor="#444"
-        android:layout_marginTop="12dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/tvPace"
-        android:text="Pace: --:-- / mi"
-        android:textSize="16sp"
-        android:textColor="#444"
-        android:layout_marginTop="6dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/tvQuote"
-        android:text="“Keep going—you’re doing great.”"
-        android:textSize="14sp"
-        android:textColor="#666"
-        android:layout_marginTop="12dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:text="Rate this run:"
-        android:textSize="14sp"
-        android:textColor="#444"
-        android:layout_marginTop="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <RatingBar
-        android:id="@+id/ratingBar"
-        android:numStars="5"
-        android:stepSize="1.0"
-        android:rating="5"
-        android:isIndicator="false"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:padding="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/btnCancel"
-            android:text="Cancel"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="48dp" />
+        <!-- Stats -->
+        <TextView
+            android:id="@+id/tvDistance"
+            android:text="Distance: 0.00 mi"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#2D2D2D"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-        <Space
-            android:layout_width="12dp"
-            android:layout_height="1dp" />
+        <TextView
+            android:id="@+id/tvPace"
+            android:text="Pace: --:-- / mi"
+            android:textSize="16sp"
+            android:textColor="#555555"
+            android:layout_marginTop="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/btnSave"
-            android:text="Save"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:background="@drawable/retro_button_bg"
-            android:textColor="@android:color/white"/>
+        <!-- Quote -->
+        <TextView
+            android:id="@+id/tvQuote"
+            android:text="“Keep going!”"
+            android:textSize="14sp"
+            android:textColor="#777777"
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="12dp"
+            android:background="#EFEFEF" />
+
+        <!-- ⭐ Rating -->
+        <TextView
+            android:text="How was it?"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#2D2D2D"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <RatingBar
+            android:id="@+id/ratingBar"
+            style="?android:attr/ratingBarStyle"
+            android:numStars="5"
+            android:stepSize="1"
+            android:isIndicator="false"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginTop="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Shown only when creating a NEW track (we toggle this group visibility in code) -->
+        <LinearLayout
+            android:id="@+id/groupNewTrack"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible">
+
+            <TextView
+                android:text="Track details"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#2D2D2D"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/inputTrackName"
+                android:hint="Track name (required for new track)"
+                android:layout_marginTop="8dp"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/inputTrackDesc"
+                android:hint="Description (optional)"
+                android:layout_marginTop="8dp"
+                android:minLines="2"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Make this track public"
+                    android:textColor="#2D2D2D"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switchMakePublic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Buttons -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/btnCancel"
+                android:text="Cancel"
+                android:textAllCaps="true"
+                android:padding="12dp"
+                android:textColor="#8B3E3E"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/btnSave"
+                android:text="Save"
+                android:textAllCaps="true"
+                android:padding="12dp"
+                android:textColor="#FFFFFF"
+                android:background="#B64D4D"
+                android:layout_marginStart="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</ScrollView>

@@ -1,13 +1,15 @@
 package com.example.raceme
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.raceme.databinding.ActivityTracksBinding
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class TracksActivity : BaseActivity() {
     private lateinit var b: ActivityTracksBinding
@@ -20,13 +22,17 @@ class TracksActivity : BaseActivity() {
         setContentView(b.root)
 
         adapter = TracksAdapter { track ->
-            Toast.makeText(this, "Selected: ${track.name}", Toast.LENGTH_SHORT).show()
+            // Return selection to the caller (StartRunActivity)
+            val data = Intent()
+                .putExtra("selected_track_name", track.name)
+                .putExtra("selected_public_race_id", track.id)
+            setResult(Activity.RESULT_OK, data)
+            finish()
         }
 
         b.rvTracks.layoutManager = LinearLayoutManager(this)
         b.rvTracks.adapter = adapter
 
-        // Search box filters the in-memory list
         b.inputSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, st: Int, c: Int, a: Int) {}
@@ -39,13 +45,14 @@ class TracksActivity : BaseActivity() {
     }
 
     private fun fetchPublicTracks() {
-        db.collection("public_races")
-            .whereEqualTo("visibility", "public")
+        db.collection("publicRaces")
+            .orderBy("name", Query.Direction.ASCENDING)
             .addSnapshotListener { snap, err ->
                 if (err != null) {
                     Toast.makeText(this, err.message ?: "Failed to load tracks", Toast.LENGTH_LONG).show()
                     return@addSnapshotListener
                 }
+
                 val list = snap?.documents?.map { doc ->
                     Track(
                         id = doc.id,
@@ -55,12 +62,11 @@ class TracksActivity : BaseActivity() {
                             doc.getDouble("distanceMeters") != null -> (doc.getDouble("distanceMeters")!! / 1609.344)
                             else -> 0.0
                         },
-                        public = (doc.getString("visibility") ?: "public") == "public",
-                        createdBy = doc.getString("ownerId"),
+                        public = true,
+                        createdBy = doc.getString("ownerUid"),
                         createdAt = doc.getTimestamp("createdAt")
                     )
                 }.orEmpty()
-                    .sortedBy { it.name.lowercase() }
 
                 adapter.setItems(list)
             }
