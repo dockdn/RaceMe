@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
 
-        <!-- (Optional) PRESENTATION MODE: launch straight to Home
+        <!-- PRESENTATION MODE: launch straight to Home
              To use, comment out the LoginActivity block above and uncomment below. -->
         <!--
         <activity
