@@ -39,6 +39,16 @@ class HomeActivity : BaseActivity() {
         // Reminders (optional button in your layout)
         b.btnReminder?.setOnClickListener { go(RemindersActivity::class.java) }
 
+        b.btnStepCounter?.setOnClickListener {
+            go(StepCounterActivity::class.java)
+        }
+        b.btnFriendRequests?.setOnClickListener {
+            go(FriendRequestsActivity::class.java)
+        }
+        b.btnLeaderboard?.setOnClickListener {
+            go(LeaderboardActivity::class.java)
+        }
+
         // Logout
         b.btnLogout.setOnClickListener {
             auth.signOut()

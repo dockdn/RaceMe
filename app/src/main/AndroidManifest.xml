@@ -70,6 +70,11 @@
         <activity android:name=".QuotesActivity" />
         <activity android:name=".RunsActivity" />
 
+        <activity android:name=".FriendRequestsActivity" />
+        <activity android:name=".LeaderboardActivity" />
+        <activity android:name=".StepCounterActivity" />
+
+
         <!-- Google Play Services version -->
         <meta-data
             android:name="com.google.android.gms.version"

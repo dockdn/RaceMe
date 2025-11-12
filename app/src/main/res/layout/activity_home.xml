@@ -156,6 +156,30 @@
             android:textColor="#FFFFFF"
             android:layout_marginBottom="10dp"/>
 
+        <!-- I just added the step counter feature nov 11 -->
+        <Button
+            android:id="@+id/btnStepCounter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Step Counter"
+            android:layout_marginTop="12dp"/>
+
+        <!-- I just added the friend requests button nov 11 -->
+        <Button
+            android:id="@+id/btnFriendRequests"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Friend Requests"
+            android:layout_marginTop="12dp"/>
+
+        <!-- I just added the leaderboard button nov 11 -->
+        <Button
+            android:id="@+id/btnLeaderboard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Leaderboard"
+            android:layout_marginTop="12dp" />
+
         <Button
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
@@ -168,5 +192,8 @@
             android:textColor="#FFFFFF"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="20dp"/>
+
+
+
     </LinearLayout>
 </ScrollView>

@@ -9,6 +9,8 @@ android {
     compileSdk 34
 
     defaultConfig {
+        // just added this
+        manifestPlaceholders += [firebase_auth_recaptcha_v2_always_enable: "false"]
         applicationId "com.example.raceme"
         minSdk 24
         targetSdk 34
@@ -27,6 +29,7 @@ android {
         viewBinding true
         dataBinding true
     }
+
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -55,6 +58,8 @@ dependencies {
 
     // Images (for profile screen)
     implementation 'io.coil-kt:coil:2.6.0'
+
+
 
     // Optional helpers
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
