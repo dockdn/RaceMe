@@ -5,12 +5,58 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPosts"
-        android:padding="12dp"
-        android:clipToPadding="false"
+    <!-- Main content: header + list -->
+    <LinearLayout
+        android:id="@+id/feedContainer"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <!-- Page header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="4dp">
+
+            <TextView
+                android:id="@+id/tvFeedTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Community Feed"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#B64D4D"
+                android:fontFamily="@font/vt323" />
+
+            <TextView
+                android:id="@+id/tvFeedSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="See what other racers have been up to this week 🏃‍♀️"
+                android:textSize="16sp"
+                android:textColor="#6B2C2C"
+                android:fontFamily="@font/vt323" />
+        </LinearLayout>
+
+        <!-- Posts list -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvPosts"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="72dp"
+            android:clipToPadding="false"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabNewPost"
@@ -20,7 +66,7 @@
         android:tint="@android:color/white"
         app:srcCompat="@android:drawable/ic_input_add"
         app:backgroundTint="#B64D4D"
-        app:layout_anchor="@id/rvPosts"
+        app:layout_anchor="@id/feedContainer"
         app:layout_anchorGravity="bottom|end"
         android:layout_margin="16dp" />
 

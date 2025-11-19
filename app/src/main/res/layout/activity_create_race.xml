@@ -1,52 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFF8F2"
+    android:padding="16dp">
 
     <LinearLayout
         android:orientation="vertical"
-        android:padding="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.material.textfield.TextInputLayout
+        <!-- Header -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create Public Track"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#B64D4D"
+            android:fontFamily="@font/vt323"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name your route, set a distance, and add where it starts 🗺️"
+            android:textSize="16sp"
+            android:textColor="#6B2C2C"
+            android:fontFamily="@font/vt323"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Track name -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Track name"
+            android:textSize="16sp"
+            android:textColor="#6B2C2C"
+            android:fontFamily="@font/vt323" />
+
+        <EditText
+            android:id="@+id/inputName"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/inputRaceName"
-                android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/retro_bar_bg"
+            android:padding="12dp"
+            android:hint="e.g. Boardwalk Sunset Loop"
+            android:fontFamily="@font/vt323"
+            android:textSize="18sp" />
+
+        <!-- Distance -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distance (miles)"
+            android:textSize="16sp"
+            android:textColor="#6B2C2C"
+            android:fontFamily="@font/vt323" />
+
+        <EditText
+            android:id="@+id/inputDistanceMiles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/retro_bar_bg"
+            android:padding="12dp"
+            android:inputType="numberDecimal"
+            android:hint="e.g. 3.10"
+            android:fontFamily="@font/vt323"
+            android:textSize="18sp" />
+
+        <!-- Description -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description"
+            android:textSize="16sp"
+            android:textColor="#6B2C2C"
+            android:fontFamily="@font/vt323" />
+
+        <EditText
+            android:id="@+id/inputDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minLines="2"
+            android:maxLines="4"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/retro_bar_bg"
+            android:padding="12dp"
+            android:hint="Flat? Hilly? Good for sunsets? Add notes here."
+            android:fontFamily="@font/vt323"
+            android:textSize="18sp" />
+
+        <!-- Location / address string -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Starting location (address)"
+            android:textSize="16sp"
+            android:textColor="#6B2C2C"
+            android:fontFamily="@font/vt323" />
+
+        <EditText
+            android:id="@+id/inputLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/retro_bar_bg"
+            android:padding="12dp"
+            android:hint="e.g. 100 Hofstra University, Hempstead, NY"
+            android:fontFamily="@font/vt323"
+            android:textSize="18sp" />
+
+        <!-- Visibility toggle -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Race name" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_weight="1"
+                android:text="Make this track public"
+                android:textSize="16sp"
+                android:textColor="#6B2C2C"
+                android:fontFamily="@font/vt323" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/inputDescription"
-                android:layout_width="match_parent"
+            <Switch
+                android:id="@+id/switchPublic"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minLines="3"
-                android:hint="Description (optional)" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:checked="true" />
+        </LinearLayout>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchPublic"
+        <!-- Buttons row -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Publish race publicly" />
+            android:orientation="horizontal"
+            android:gravity="end">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSaveRace"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Save"
-            app:cornerRadius="12dp"
-            app:backgroundTint="#B64D4D"
-            android:textColor="@android:color/white"/>
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                android:textAllCaps="false"
+                android:backgroundTint="#DDDDDD"
+                android:textColor="#333333"
+                android:fontFamily="@font/vt323"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save track"
+                android:textAllCaps="false"
+                android:backgroundTint="#B64D4D"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/vt323" />
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

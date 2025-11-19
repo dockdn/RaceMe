@@ -41,7 +41,6 @@
             android:id="@+id/tvBadgesSummary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="You’ve earned 0 badges so far. Let’s change that. 🏅"
             android:textSize="16sp"
             android:fontFamily="@font/vt323"
             android:textColor="#6B2C2C" />

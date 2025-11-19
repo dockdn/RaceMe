@@ -101,6 +101,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <!-- 🔥 NEW: Starting location / address for the track -->
+            <EditText
+                android:id="@+id/inputTrackLocation"
+                android:hint="Starting location (address, optional)"
+                android:layout_marginTop="8dp"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
             <LinearLayout
                 android:orientation="horizontal"
                 android:gravity="center_vertical"

@@ -7,15 +7,20 @@
     android:layout_marginEnd="8dp"
     android:layout_marginTop="6dp"
     android:layout_marginBottom="6dp"
+    android:backgroundTint="#FFFFFF"
     app:cardCornerRadius="18dp"
     app:cardElevation="5dp"
     app:strokeColor="#F3D9C7"
     app:strokeWidth="1dp"
-    android:backgroundTint="#FFFFFF">
+    app:cardUseCompatPadding="true"
+    app:cardPreventCornerOverlap="false">
 
     <LinearLayout
         android:orientation="vertical"
-        android:padding="14dp"
+        android:paddingLeft="14dp"
+        android:paddingTop="14dp"
+        android:paddingRight="14dp"
+        android:paddingBottom="18dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -69,24 +74,27 @@
             android:background="#FFF3EA"
             android:contentDescription="Post photo" />
 
-        <!-- Like Button -->
+        <!-- Like row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp"
-            android:gravity="end">
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="end|center_vertical">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLike"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="wrap_content"
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:insetLeft="8dp"
                 android:insetRight="8dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
                 android:text="♥ 0"
                 android:textSize="14sp"
                 android:textAllCaps="false"
