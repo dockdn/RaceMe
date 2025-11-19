@@ -38,7 +38,7 @@ class EventsActivity : AppCompatActivity() {
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = eventsAdapter
 
-        // Default: show all events
+        // Show all events
         startAllEventsListener()
 
         radioGroup.setOnCheckedChangeListener { _, checkedId ->

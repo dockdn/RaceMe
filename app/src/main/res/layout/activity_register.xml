@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Fun header emoji -->
+        <!-- Header Emoji -->
         <TextView
             android:id="@+id/registerEmoji"
             android:layout_width="wrap_content"
@@ -23,7 +23,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp" />
 
-        <!-- Big Title -->
+        <!-- Title Text -->
         <TextView
             android:id="@+id/registerTitle"
             android:layout_width="wrap_content"

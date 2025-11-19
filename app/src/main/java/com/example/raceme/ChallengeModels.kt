@@ -52,7 +52,7 @@ object ChallengeCatalog {
             days = 30
         ),
 
-        // --- NEW challenges ---
+        // NEW challenges
 
         // Long single run
         ChallengeDef(
