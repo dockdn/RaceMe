@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -46,6 +48,10 @@ class StartRunActivity : BaseActivity() {
     private var lastFix: Location? = null
     private var distanceMeters: Double = 0.0
 
+    // High-resolution timer (for mm:ss.hh display)
+    private val timerHandler = Handler(Looper.getMainLooper())
+    private var timerRunnable: Runnable? = null
+
     private val locationPermLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { grants ->
@@ -84,19 +90,28 @@ class StartRunActivity : BaseActivity() {
         b.ddTrack.setOnItemClickListener { _, _, position, _ ->
             when (position) {
                 0 -> {
+                    // Explicitly chose: Start a new track
                     selectedPublicRaceId = null
                     selectedTrackName = "New Track"
                     selectedType = null
                     Toast.makeText(this, "New track selected", Toast.LENGTH_SHORT).show()
                 }
-                1 -> pickTrack.launch(Intent(this, TracksActivity::class.java))
+                1 -> {
+                    // Browse & pick public track
+                    pickTrack.launch(Intent(this, TracksActivity::class.java))
+                }
             }
         }
-        b.ddTrack.setText(options.first(), false)
-        selectedTrackName = "New Track"
+        // ⛔ No default selection anymore – user must pick something
+        b.ddTrack.setText("", false)
+        selectedTrackName = null
 
         b.tvMiles.text = "0.00 mi"
         b.btnPause.text = "Start"
+
+        // Initialize timer text
+        b.chronometer.base = SystemClock.elapsedRealtime()
+        b.chronometer.text = formatElapsedTime(0L)
 
         b.btnPause.setOnClickListener {
             if (isPaused && startedAtMillis == null) startRun()
@@ -114,16 +129,45 @@ class StartRunActivity : BaseActivity() {
         b.btnMenuProfile.setOnClickListener { go(ProfileActivity::class.java); toggleMenu(closeOnly = true) }
     }
 
+    // ========= Timer helpers (mm:ss.hh) =========
+
+    private fun formatElapsedTime(elapsedMs: Long): String {
+        val totalSeconds = elapsedMs / 1000
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+        val hundredths = (elapsedMs % 1000) / 10  // 0–99
+        return String.format("%02d:%02d.%02d", minutes, seconds, hundredths)
+    }
+
+    private fun startTimerLoop() {
+        if (timerRunnable != null) return
+        timerRunnable = object : Runnable {
+            override fun run() {
+                val elapsedMs = SystemClock.elapsedRealtime() - b.chronometer.base
+                b.chronometer.text = formatElapsedTime(elapsedMs)
+                timerHandler.postDelayed(this, 50L) // ~20 FPS
+            }
+        }
+        timerHandler.post(timerRunnable!!)
+    }
+
+    private fun stopTimerLoop() {
+        timerRunnable?.let { timerHandler.removeCallbacks(it) }
+        timerRunnable = null
+    }
+
+    // ============================================
+
     private fun onStartPauseClicked() {
         if (isPaused) {
             b.chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
-            b.chronometer.start()
+            startTimerLoop()
             isPaused = false
             b.btnPause.text = "Pause"
             ensureLocationPermissionThenStart()
         } else {
             pauseOffset = SystemClock.elapsedRealtime() - b.chronometer.base
-            b.chronometer.stop()
+            stopTimerLoop()
             isPaused = true
             b.btnPause.text = "Resume"
             stopLocationUpdates()
@@ -131,6 +175,18 @@ class StartRunActivity : BaseActivity() {
     }
 
     private fun startRun() {
+        // ✅ Require explicit track selection before starting
+        if (selectedTrackName.isNullOrBlank() && selectedPublicRaceId == null) {
+            Toast.makeText(
+                this,
+                "Please choose \"Start a new track\" or select a public track before starting your run.",
+                Toast.LENGTH_LONG
+            ).show()
+            b.ddTrack.requestFocus()
+            b.ddTrack.performClick()
+            return
+        }
+
         if (startedAtMillis == null) startedAtMillis = System.currentTimeMillis()
         if (pauseOffset == 0L && isPaused) {
             distanceMeters = 0.0
@@ -138,7 +194,7 @@ class StartRunActivity : BaseActivity() {
             b.tvMiles.text = "0.00 mi"
         }
         b.chronometer.base = SystemClock.elapsedRealtime() - pauseOffset
-        b.chronometer.start()
+        startTimerLoop()
         isPaused = false
         b.btnPause.text = "Pause"
         ensureLocationPermissionThenStart()
@@ -199,7 +255,7 @@ class StartRunActivity : BaseActivity() {
         val startMs = startedAtMillis ?: endMs
         val elapsedMs = SystemClock.elapsedRealtime() - b.chronometer.base
 
-        b.chronometer.stop()
+        stopTimerLoop()
         stopLocationUpdates()
         isPaused = true
         b.btnPause.text = "Start"
@@ -369,6 +425,7 @@ class StartRunActivity : BaseActivity() {
         distanceMeters = 0.0
         b.btnPause.text = "Start"
         b.chronometer.base = SystemClock.elapsedRealtime()
+        b.chronometer.text = formatElapsedTime(0L)
         b.tvMiles.text = "0.00 mi"
     }
 
@@ -394,11 +451,17 @@ class StartRunActivity : BaseActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (!isPaused) stopLocationUpdates()
+        if (!isPaused) {
+            stopLocationUpdates()
+            stopTimerLoop()
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (!isPaused && startedAtMillis != null) ensureLocationPermissionThenStart()
+        if (!isPaused && startedAtMillis != null) {
+            ensureLocationPermissionThenStart()
+            startTimerLoop()
+        }
     }
 }

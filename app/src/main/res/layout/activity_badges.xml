@@ -1,7 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rvBadges"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="12dp"
-    android:background="#FFF8F2"/>
+    android:orientation="vertical"
+    android:background="#FFF8F2"
+    android:padding="16dp">
+
+    <!-- Hero / header card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:padding="16dp"
+        android:elevation="2dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/tvBadgesTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Badges"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/vt323"
+            android:textColor="#B64D4D"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvBadgesSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Collect milestones as you run, race, and show up consistently."
+            android:textSize="18sp"
+            android:fontFamily="@font/vt323"
+            android:textColor="#444444"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvBadgesSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="You’ve earned 0 badges so far. Let’s change that. 🏅"
+            android:textSize="16sp"
+            android:fontFamily="@font/vt323"
+            android:textColor="#6B2C2C" />
+
+    </LinearLayout>
+
+    <!-- Section label -->
+    <TextView
+        android:id="@+id/tvBadgesSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your badge collection"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/vt323"
+        android:textColor="#B64D4D"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Badges list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvBadges"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:clipToPadding="false" />
+
+</LinearLayout>

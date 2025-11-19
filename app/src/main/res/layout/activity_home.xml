@@ -3,197 +3,314 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
     android:background="#FFF8F2"
+    android:padding="16dp"
     tools:context=".HomeActivity">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal">
+        android:layout_height="wrap_content">
 
-        <!-- Title & Greeting -->
-        <TextView
-            android:id="@+id/tvGreeting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Welcome back, Racer!"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/vt323"
-            android:textColor="#B64D4D"
-            android:layout_marginBottom="6dp"/>
-
-        <TextView
-            android:id="@+id/tvSub"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Stay consistent. Small steps win races."
-            android:textSize="18sp"
-            android:textColor="#444444"
-            android:fontFamily="@font/vt323"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"/>
-
-        <!-- Buttons Section -->
-        <Button
-            android:id="@+id/btnStart"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="🏁 Start Run"
-            android:textAllCaps="false"
-            android:textSize="20sp"
-            android:fontFamily="@font/vt323"
-            android:backgroundTint="#B64D4D"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="10dp"/>
-
-        <Button
-            android:id="@+id/btnReports"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="📊 Reports"
-            android:textAllCaps="false"
-            android:textSize="20sp"
-            android:fontFamily="@font/vt323"
-            android:backgroundTint="#B64D4D"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="10dp"/>
-
-        <Button
-            android:id="@+id/btnChallenges"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="🔥 Challenges"
-            android:textAllCaps="false"
-            android:textSize="20sp"
-            android:fontFamily="@font/vt323"
-            android:backgroundTint="#B64D4D"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="10dp"/>
-
-        <Button
-            android:id="@+id/btnBadges"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="🏅 Badges"
-            android:textAllCaps="false"
-            android:textSize="20sp"
-            android:fontFamily="@font/vt323"
-            android:backgroundTint="#B64D4D"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="10dp"/>
-
-        <Button
-            android:id="@+id/btnEditProfile"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="👤 Edit Profile"
-            android:textAllCaps="false"
-            android:textSize="20sp"
-            android:fontFamily="@font/vt323"
-            android:backgroundTint="#B64D4D"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="10dp"/>
-
-        <Button
-            android:id="@+id/btnQuotes"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="💬 Motivation Quotes"
-            android:textAllCaps="false"
-            android:textSize="20sp"
-            android:fontFamily="@font/vt323"
-            android:backgroundTint="#B64D4D"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="10dp"/>
-
-        <Button
-            android:id="@+id/btnReminder"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="⏰ Set Reminder"
-            android:textAllCaps="false"
-            android:textSize="20sp"
-            android:fontFamily="@font/vt323"
-            android:backgroundTint="#B64D4D"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="10dp"/>
-
-        <Button
-            android:id="@+id/btnMyRuns"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="🗂️  My Runs and Ratings"
-            android:background="@drawable/retro_button_bg"
-            android:textColor="@color/white"
-            android:layout_marginBottom="10dp"/>
-
-        <!-- 🆕 Community Feed -->
-        <Button
-            android:id="@+id/btnFeed"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="📰 Community Feed"
-            android:textAllCaps="false"
-            android:textSize="20sp"
-            android:fontFamily="@font/vt323"
-            android:backgroundTint="#B64D4D"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="10dp"/>
-
-        <!-- New Post -->
-        <Button
-            android:id="@+id/btnNewPost"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="➕ New Post"
-            android:textAllCaps="false"
-            android:textSize="20sp"
-            android:fontFamily="@font/vt323"
-            android:backgroundTint="#B64D4D"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="10dp"/>
-
-        <!-- I just added the step counter feature nov 11 -->
-        <Button
-            android:id="@+id/btnStepCounter"
+        <!-- ===== HERO AREA ===== -->
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Step Counter"
-            android:layout_marginTop="12dp"/>
+            android:padding="16dp"
+            android:background="#FFFFFF"
+            android:elevation="2dp"
+            android:layout_marginBottom="16dp"
+            android:clipToOutline="true">
 
-        <!-- I just added the friend requests button nov 11 -->
-        <Button
-            android:id="@+id/btnFriendRequests"
+            <TextView
+                android:id="@+id/tvGreeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome back, Racer!"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/vt323"
+                android:textColor="#B64D4D"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:id="@+id/tvSub"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Stay consistent. Small steps win races."
+                android:textSize="16sp"
+                android:textColor="#444444"
+                android:fontFamily="@font/vt323"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Big primary action -->
+            <Button
+                android:id="@+id/btnStart"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="🏁 Start Run"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:fontFamily="@font/vt323"
+                android:backgroundTint="#B64D4D"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Quick actions row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnEvents"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="📅 Events"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/vt323"
+                    android:backgroundTint="#E7C1B6"
+                    android:textColor="#6B2C2C" />
+
+                <Button
+                    android:id="@+id/btnStepCounter"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="📟 Steps"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/vt323"
+                    android:backgroundTint="#E7C1B6"
+                    android:textColor="#6B2C2C" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ===== CARD: PROGRESS ===== -->
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Friend Requests"
-            android:layout_marginTop="12dp"/>
+            android:padding="16dp"
+            android:background="#FFFFFF"
+            android:elevation="2dp"
+            android:layout_marginBottom="16dp">
 
-        <!-- I just added the leaderboard button nov 11 -->
-        <Button
-            android:id="@+id/btnLeaderboard"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Your progress"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/vt323"
+                android:textColor="#B64D4D"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Row: Reports + My Runs -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <Button
+                    android:id="@+id/btnReports"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="📊 Reports"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/vt323"
+                    android:backgroundTint="#F7DED4"
+                    android:textColor="#6B2C2C" />
+
+                <Button
+                    android:id="@+id/btnMyRuns"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="🗂️ My Runs"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/vt323"
+                    android:backgroundTint="#F7DED4"
+                    android:textColor="#6B2C2C" />
+            </LinearLayout>
+
+            <!-- Row: Challenges + Badges -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnChallenges"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="🔥 Challenges"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/vt323"
+                    android:backgroundTint="#F7DED4"
+                    android:textColor="#6B2C2C" />
+
+                <Button
+                    android:id="@+id/btnBadges"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="🏅 Badges"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/vt323"
+                    android:backgroundTint="#F7DED4"
+                    android:textColor="#6B2C2C" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ===== CARD: COMMUNITY ===== -->
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Leaderboard"
-            android:layout_marginTop="12dp" />
+            android:padding="16dp"
+            android:background="#FFFFFF"
+            android:elevation="2dp"
+            android:layout_marginBottom="16dp">
 
-        <Button
-            android:id="@+id/btnLogout"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Community"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/vt323"
+                android:textColor="#B64D4D"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Row: Feed + Friend Requests -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <Button
+                    android:id="@+id/btnFeed"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="📰 Feed"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/vt323"
+                    android:backgroundTint="#F7DED4"
+                    android:textColor="#6B2C2C" />
+
+                <Button
+                    android:id="@+id/btnFriendRequests"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="👥 Requests"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/vt323"
+                    android:backgroundTint="#F7DED4"
+                    android:textColor="#6B2C2C" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnLeaderboard"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="🏆 Leaderboard"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:fontFamily="@font/vt323"
+                android:backgroundTint="#F7DED4"
+                android:textColor="#6B2C2C" />
+        </LinearLayout>
+
+        <!-- ===== CARD: TOOLS & ACCOUNT ===== -->
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="🚪 Logout"
-            android:textAllCaps="false"
-            android:textSize="20sp"
-            android:fontFamily="@font/vt323"
-            android:backgroundTint="#8B3E3E"
-            android:textColor="#FFFFFF"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="20dp"/>
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:background="#FFFFFF"
+            android:elevation="2dp"
+            android:layout_marginBottom="24dp">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tools and account"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/vt323"
+                android:textColor="#B64D4D"
+                android:layout_marginBottom="8dp"/>
 
+            <!-- Row: Reminder + Edit Profile -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <Button
+                    android:id="@+id/btnReminder"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="⏰ Reminder"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/vt323"
+                    android:backgroundTint="#F7DED4"
+                    android:textColor="#6B2C2C" />
+
+                <Button
+                    android:id="@+id/btnEditProfile"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="👤 Edit Profile"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/vt323"
+                    android:backgroundTint="#F7DED4"
+                    android:textColor="#6B2C2C" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="🚪 Logout"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:fontFamily="@font/vt323"
+                android:backgroundTint="#8B3E3E"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

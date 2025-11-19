@@ -5,6 +5,7 @@ import android.widget.Toast
 import com.example.raceme.databinding.ActivityHomeBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeActivity : BaseActivity() {
@@ -15,13 +16,18 @@ class HomeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val user = auth.currentUser ?: run { go(LoginActivity::class.java); finish(); return }
+        val user = auth.currentUser ?: run {
+            go(LoginActivity::class.java)
+            finish()
+            return
+        }
+
         b = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        // Greeting + subheader
+        // Greeting + smart subheader quote
         setGreeting(user, preferFirestore = true)
-        b.tvSub.text = "Stay consistent. Small steps win races."
+        updateLoginCountAndMotivationQuote(user)
 
         // Core navigation
         b.btnStart.setOnClickListener { go(StartRunActivity::class.java) }
@@ -29,23 +35,25 @@ class HomeActivity : BaseActivity() {
         b.btnChallenges.setOnClickListener { go(ChallengesActivity::class.java) }
         b.btnBadges.setOnClickListener { go(BadgesActivity::class.java) }
         b.btnEditProfile.setOnClickListener { go(ProfileActivity::class.java) }
-        b.btnQuotes.setOnClickListener { go(QuotesActivity::class.java) }
         b.btnMyRuns.setOnClickListener { go(RunsActivity::class.java) }
 
-        // 🆕 Community Feed + New Post (safe-call in case buttons aren’t in XML yet)
-        b.btnFeed?.setOnClickListener { go(FeedActivity::class.java) }
-        b.btnNewPost?.setOnClickListener { go(NewPostActivity::class.java) }
+        // Community feed
+        b.btnFeed.setOnClickListener { go(FeedActivity::class.java) }
 
-        // Reminders (optional button in your layout)
-        b.btnReminder?.setOnClickListener { go(RemindersActivity::class.java) }
+        // Events screen
+        b.btnEvents.setOnClickListener { go(EventsActivity::class.java) }
 
-        b.btnStepCounter?.setOnClickListener {
+        // Reminders
+        b.btnReminder.setOnClickListener { go(RemindersActivity::class.java) }
+
+        // Extra features
+        b.btnStepCounter.setOnClickListener {
             go(StepCounterActivity::class.java)
         }
-        b.btnFriendRequests?.setOnClickListener {
+        b.btnFriendRequests.setOnClickListener {
             go(FriendRequestsActivity::class.java)
         }
-        b.btnLeaderboard?.setOnClickListener {
+        b.btnLeaderboard.setOnClickListener {
             go(LeaderboardActivity::class.java)
         }
 
@@ -62,11 +70,14 @@ class HomeActivity : BaseActivity() {
         super.onResume()
         val u = FirebaseAuth.getInstance().currentUser
         if (u == null) {
-            go(LoginActivity::class.java); finish()
+            go(LoginActivity::class.java)
+            finish()
             return
         }
         // Refresh greeting after a possible profile change
-        u.reload().addOnCompleteListener { setGreeting(u, preferFirestore = true) }
+        u.reload().addOnCompleteListener {
+            setGreeting(u, preferFirestore = true)
+        }
     }
 
     private fun setGreeting(user: FirebaseUser?, preferFirestore: Boolean) {
@@ -81,6 +92,36 @@ class HomeActivity : BaseActivity() {
                 if (!name.isNullOrBlank()) {
                     b.tvGreeting.text = "Welcome back, $name!"
                 }
+            }
+    }
+
+    private fun updateLoginCountAndMotivationQuote(user: FirebaseUser) {
+        val userDoc = db.collection("users").document(user.uid)
+
+        // Increment loginCount every time Home is opened
+        userDoc.update("loginCount", FieldValue.increment(1))
+            .addOnCompleteListener {
+                // After increment, read stats and choose quote
+                userDoc.get()
+                    .addOnSuccessListener { snap ->
+                        val loginCount = snap.getLong("loginCount") ?: 0L
+                        val challengesCompleted = snap.getLong("challengesCompleted") ?: 0L
+
+                        val stats = UserMotivationStats(
+                            loginCount = loginCount,
+                            challengesCompleted = challengesCompleted
+                        )
+
+                        val quote = MotivationRepository.getQuoteFor(stats)
+                        b.tvSub.text = quote
+                    }
+                    .addOnFailureListener {
+                        // Fallback quote if Firestore read fails
+                        val fallbackQuote = MotivationRepository.getQuoteFor(
+                            UserMotivationStats(0L, 0L)
+                        )
+                        b.tvSub.text = fallbackQuote
+                    }
             }
     }
 }

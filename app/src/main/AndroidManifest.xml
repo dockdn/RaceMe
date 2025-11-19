@@ -8,7 +8,9 @@
     <!-- Location (StartRunActivity tracking) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="false" />
 
     <!-- Notifications (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -33,8 +35,8 @@
             </intent-filter>
         </activity>
 
-        <!-- PRESENTATION MODE: launch straight to Home
-             To use, comment out the LoginActivity block above and uncomment below. -->
+        <!-- PRESENTATION MODE
+             To use, comment out LoginActivity above and uncomment below -->
         <!--
         <activity
             android:name=".HomeActivity"
@@ -57,7 +59,7 @@
         <activity android:name=".FeedActivity" />
         <activity android:name=".NewPostActivity" />
 
-        <!-- Other activities (no intent-filters; exported not required) -->
+        <!-- Other screens -->
         <activity android:name=".HomeActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".ProfileActivity" />
@@ -67,17 +69,17 @@
         <activity android:name=".ReportsActivity" />
         <activity android:name=".BadgesActivity" />
         <activity android:name=".TracksActivity" />
-        <activity android:name=".QuotesActivity" />
         <activity android:name=".RunsActivity" />
-
         <activity android:name=".FriendRequestsActivity" />
         <activity android:name=".LeaderboardActivity" />
         <activity android:name=".StepCounterActivity" />
-
+        <activity android:name=".EventsActivity" />
+        <activity android:name=".CreateEventActivity" />
 
         <!-- Google Play Services version -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
     </application>
 </manifest>

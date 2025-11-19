@@ -1,30 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#FFF8F2"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFF8F2"
+    android:padding="24dp"
+    android:fillViewport="true">
 
     <LinearLayout
-        android:padding="16dp"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
+        <!-- Header: title + subtitle -->
+        <TextView
+            android:id="@+id/tvNewPostTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create a post"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#B64D4D"
+            android:fontFamily="@font/vt323"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvNewPostSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share your run, wins, or a boost of motivation ✨"
+            android:textSize="18sp"
+            android:textColor="#6B6B6B"
+            android:fontFamily="@font/vt323"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Main card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:foreground="?attr/selectableItemBackground"
-            app:cardCornerRadius="18dp"
+            android:padding="18dp"
+            app:cardCornerRadius="20dp"
             app:strokeColor="#F3D9C7"
             app:strokeWidth="1dp"
-            android:padding="16dp">
+            app:cardElevation="4dp">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
+                <!-- Label for text -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Caption"
+                    android:textSize="18sp"
+                    android:textColor="#B64D4D"
+                    android:fontFamily="@font/vt323"
+                    android:layout_marginBottom="4dp" />
+
+                <!-- Caption field -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -41,22 +79,54 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minLines="3"
-                        android:maxLines="6" />
+                        android:maxLines="6"
+                        android:padding="10dp"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/vt323"
+                        android:textColor="#2D2D2D"
+                        android:hint="Tell your followers about your run, how you felt, or a tip…" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Label for image -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Photo (optional)"
+                    android:textSize="18sp"
+                    android:textColor="#B64D4D"
+                    android:fontFamily="@font/vt323"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="4dp" />
+
+                <!-- Image preview -->
                 <ImageView
                     android:id="@+id/ivPreview"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:scaleType="centerCrop"
-                    android:layout_marginTop="12dp"
-                    android:background="#FFF3EA" />
+                    android:background="#FFF3EA"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="Selected photo preview"
+                    android:padding="4dp" />
 
-                <LinearLayout
-                    android:orientation="horizontal"
+                <!-- Hint under preview -->
+                <TextView
+                    android:id="@+id/tvPhotoHint"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp">
+                    android:text="Add a photo of your route, shoes, or post-run glow ✨"
+                    android:textSize="14sp"
+                    android:textColor="#7A7A7A"
+                    android:fontFamily="@font/vt323"
+                    android:layout_marginTop="6dp" />
+
+                <!-- Buttons row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnPickImage"
@@ -64,12 +134,16 @@
                         android:layout_height="wrap_content"
                         android:text="Add photo 📷"
                         android:textAllCaps="false"
-                        app:backgroundTint="#FFE5CC" />
+                        android:textSize="16sp"
+                        android:fontFamily="@font/vt323"
+                        android:textColor="#4A1C1C"
+                        app:cornerRadius="18dp"
+                        app:backgroundTint="#D9A08E" />
 
                     <View
                         android:layout_width="0dp"
                         android:layout_height="1dp"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnPost"
@@ -77,7 +151,10 @@
                         android:layout_height="wrap_content"
                         android:text="Post"
                         android:textAllCaps="false"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/vt323"
                         android:textColor="@android:color/white"
+                        app:cornerRadius="18dp"
                         app:backgroundTint="#B64D4D" />
                 </LinearLayout>
 
@@ -85,4 +162,5 @@
         </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
+
 </ScrollView>

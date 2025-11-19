@@ -1,77 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginBottom="12dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="5dp"
     app:strokeColor="#F3D9C7"
-    app:strokeWidth="1dp">
+    app:strokeWidth="1dp"
+    android:backgroundTint="#FFFFFF">
 
     <LinearLayout
-        android:padding="14dp"
         android:orientation="vertical"
+        android:padding="14dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Header: name + time -->
+        <!-- Top row: name + time -->
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/tvName"
-                android:textStyle="bold"
-                android:textColor="#B64D4D"
-                android:textSize="16sp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:text="Runner Name"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#B64D4D"
+                android:fontFamily="@font/vt323" />
 
             <TextView
                 android:id="@+id/tvTime"
-                android:textColor="#777777"
-                android:textSize="12sp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Nov 17, 3:42 PM"
+                android:textSize="14sp"
+                android:textColor="#777777"
+                android:fontFamily="@font/vt323" />
         </LinearLayout>
 
         <!-- Post text -->
         <TextView
             android:id="@+id/tvText"
-            android:textColor="#2D2D2D"
-            android:textSize="15sp"
-            android:layout_marginTop="6dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Felt strong on today’s 3 mile run!"
+            android:textSize="18sp"
+            android:textColor="#2D2D2D"
+            android:fontFamily="@font/vt323" />
 
-        <!-- Optional photo -->
+        <!-- Photo (optional) -->
         <ImageView
             android:id="@+id/ivPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
             android:layout_marginTop="8dp"
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
+            android:background="#FFF3EA"
+            android:contentDescription="Post photo" />
+
+        <!-- Like Button -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFF3EA" />
-
-        <!-- Actions -->
-        <LinearLayout
             android:orientation="horizontal"
             android:layout_marginTop="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:gravity="end">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLike"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="32dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:insetLeft="8dp"
+                android:insetRight="8dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:text="♥ 0"
+                android:textSize="14sp"
                 android:textAllCaps="false"
-                app:iconPadding="0dp"
-                app:backgroundTint="#FFE5CC" />
+                android:fontFamily="@font/vt323"
+                android:textColor="@android:color/white"
+                app:cornerRadius="16dp"
+                app:backgroundTint="#B64D4D" />
+
         </LinearLayout>
 
     </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

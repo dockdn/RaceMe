@@ -1,132 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFF8F2"
-    android:padding="24dp">
+    android:padding="32dp"
+    android:fillViewport="true">
 
-    <!-- Main Login Card -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardLogin"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:cardCornerRadius="22dp"
-        app:strokeColor="#F3D9C7"
-        app:strokeWidth="1dp"
-        app:cardElevation="4dp"
-        android:backgroundTint="#FFFFFF"
-        android:padding="28dp">
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:gravity="top|center_horizontal"
+        <!-- Logo (Emoji Placeholder, CHANGE AFTER) -->
+        <TextView
+            android:id="@+id/loginEmoji"
+            android:text="🏁"
+            android:textSize="64sp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Big Title -->
+        <TextView
+            android:id="@+id/title"
+            android:text="RaceMe"
+            android:textSize="42sp"
+            android:textStyle="bold"
+            android:textColor="#B64D4D"
+            android:fontFamily="@font/vt323"
+            android:layout_marginBottom="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Tagline -->
+        <TextView
+            android:id="@+id/subtitle"
+            android:text="Where progress becomes a habit ✨"
+            android:textSize="20sp"
+            android:textColor="#6B6B6B"
+            android:fontFamily="@font/vt323"
+            android:layout_marginBottom="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Email Input -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:backgroundTint="#FFFFFF"
+            app:boxBackgroundMode="filled"
+            app:boxCornerRadiusTopStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxBackgroundColor="#FFFFFF"
+            app:startIconDrawable="@android:drawable/ic_dialog_email">
 
-            <!-- Header -->
-            <TextView
-                android:text="RaceMe"
-                android:textColor="#B64D4D"
-                android:textSize="36sp"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputEmail"
                 android:fontFamily="@font/vt323"
-                android:textStyle="bold"
-                android:layout_marginBottom="6dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:text="Welcome back 🏁"
-                android:textColor="#6B6B6B"
-                android:textSize="16sp"
-                android:layout_marginBottom="20dp"
-                android:fontFamily="@font/vt323"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <!-- Email Field -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Email"
-                app:boxBackgroundMode="outline"
-                app:boxStrokeColor="#B64D4D"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/inputEmail"
-                    android:inputType="textEmailAddress"
-                    android:fontFamily="@font/vt323"
-                    android:textColor="#2D2D2D"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Password Field (no toggle) -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="Password"
-                app:boxBackgroundMode="outline"
-                app:boxStrokeColor="#B64D4D"
-                app:passwordToggleEnabled="false"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/inputPassword"
-                    android:inputType="textPassword"
-                    android:fontFamily="@font/vt323"
-                    android:textColor="#2D2D2D"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Login Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLogin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Sign in"
-                android:textAllCaps="false"
-                android:layout_marginTop="20dp"
-                android:textColor="@android:color/white"
-                app:cornerRadius="14dp"
-                android:fontFamily="@font/vt323"
-                app:backgroundTint="#B64D4D" />
-
-            <!-- Register Link -->
-            <TextView
-                android:id="@+id/linkRegister"
-                android:text="New here? Create an account →"
-                android:textColor="#B64D4D"
-                android:textSize="14sp"
-                android:fontFamily="@font/vt323"
-                android:gravity="center"
-                android:layout_marginTop="14dp"
+                android:textColor="#2D2D2D"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:inputType="textEmailAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Footer Quote -->
-            <TextView
-                android:text="“Stay consistent. Small steps win races.”"
-                android:textColor="#7A7A7A"
-                android:textSize="13sp"
-                android:gravity="center"
-                android:layout_marginTop="18dp"
+        <!-- Password Input -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Password"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            app:boxBackgroundMode="filled"
+            app:boxCornerRadiusTopStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxBackgroundColor="#FFFFFF"
+            app:passwordToggleEnabled="true"
+            app:startIconDrawable="@android:drawable/ic_lock_idle_lock">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputPassword"
                 android:fontFamily="@font/vt323"
+                android:textColor="#2D2D2D"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:inputType="textPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Login Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sign in"
+            android:textAllCaps="false"
+            android:textSize="24sp"
+            android:fontFamily="@font/vt323"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="12dp"
+            app:cornerRadius="18dp"
+            app:backgroundTint="#B64D4D" />
+
+        <!-- Create an account -->
+        <TextView
+            android:id="@+id/linkRegister"
+            android:text="New here? Create an account →"
+            android:textColor="#B64D4D"
+            android:textSize="18sp"
+            android:fontFamily="@font/vt323"
+            android:layout_marginTop="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Another Tagline -->
+        <TextView
+            android:id="@+id/quote"
+            android:text="“Small steps today.\nBig races tomorrow.”"
+            android:textColor="#7A7A7A"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:layout_marginTop="40dp"
+            android:fontFamily="@font/vt323"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</ScrollView>
