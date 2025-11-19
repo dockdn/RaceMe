@@ -15,7 +15,7 @@ object BadgeRepo {
         Badge("hour_of_power",   "Hour of Power",     "🕒", colorRes = R.color.badge_purple),
         Badge("steady_20x5",     "Steady Strider",    "🎧", colorRes = R.color.badge_green),
 
-        // Volume / consistency
+        // Consistency
         Badge("weekly_15",       "Mileage Beast",     "💨", colorRes = R.color.badge_blue),
         Badge("ten_runs_30",     "Ten-Run Titan",     "🔟", colorRes = R.color.badge_green),
         Badge("weekend_warrior", "Weekend Warrior",   "🎉", colorRes = R.color.badge_orange),

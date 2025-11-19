@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:text="Steps Taken: 0"
         android:textSize="20sp"
-        android:padding="8dp"/>
+        android:padding="8dp" />
 
     <TextView
         android:id="@+id/tvStepGoal"
@@ -20,25 +20,47 @@
         android:layout_height="wrap_content"
         android:text="Step Goal: Not Set"
         android:textSize="16sp"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp" />
+
+    <!-- Progress percentage -->
+    <TextView
+        android:id="@+id/tvProgressPercent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="0%"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_marginTop="12dp" />
+
+    <!-- Horizontal step progress bar -->
+    <ProgressBar
+        android:id="@+id/progressSteps"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:progress="0"
+        android:max="100"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp" />
 
     <EditText
         android:id="@+id/etStepGoal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Step Goal"/>
+        android:hint="Enter Step Goal" />
 
     <Button
         android:id="@+id/btnSetGoal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Set Goal"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp" />
 
     <Button
         android:id="@+id/btnReset"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Reset Steps"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp" />
+
 </LinearLayout>
