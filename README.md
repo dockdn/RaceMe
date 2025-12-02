@@ -122,8 +122,5 @@ RaceMe encourages users to stay active by combining:
 
 ## ❤️ **Notes**
 
-RaceMe is now entering the fun stage — refining visuals, improving UX, and adding the features that make the app feel exciting and alive.
-
-You’ve built a strong, stable foundation.
-The app is functional, scalable, and ready for polish ✨
+RaceMe is now entering the fun stage... refining visuals, improving UX, and adding the features that make the app feel exciting and alive.
 
