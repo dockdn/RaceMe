@@ -6,7 +6,39 @@
     android:background="#FFF8F2"
     android:padding="16dp">
 
-    <!-- Hero / header card -->
+    <!-- header bar -->
+    <LinearLayout
+        android:id="@+id/headerBadges"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/btnBackBadges"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:padding="4dp"
+            android:src="@drawable/ic_back_arrow"
+            android:contentDescription="Back to home" />
+
+        <TextView
+            android:id="@+id/tvBadgesHeaderTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Badges"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/vt323"
+            android:textColor="#B64D4D" />
+
+    </LinearLayout>
+
+    <!-- hero / header card -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -47,7 +79,7 @@
 
     </LinearLayout>
 
-    <!-- Section label -->
+    <!-- section label -->
     <TextView
         android:id="@+id/tvBadgesSection"
         android:layout_width="match_parent"
@@ -59,7 +91,7 @@
         android:textColor="#B64D4D"
         android:layout_marginBottom="8dp" />
 
-    <!-- Badges list -->
+    <!-- badges list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvBadges"
         android:layout_width="match_parent"

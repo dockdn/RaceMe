@@ -1,7 +1,7 @@
 package com.example.raceme
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.raceme.databinding.ActivityBadgesBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -14,13 +14,16 @@ import com.example.raceme.models.RunPoint
 import com.example.raceme.models.BadgeDef
 import com.example.raceme.models.BadgeRow
 
-class BadgesActivity : AppCompatActivity() {
+class BadgesActivity : BaseActivity() {
+
+    // view binding and adapters
     private lateinit var b: ActivityBadgesBinding
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }
     private val tz by lazy { ZoneId.systemDefault() }
     private val adapter = BadgesAdapter()
 
+    // lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val user = auth.currentUser ?: run { finish(); return }
@@ -29,8 +32,20 @@ class BadgesActivity : AppCompatActivity() {
 
         b.rvBadges.layoutManager = GridLayoutManager(this, 2)
         b.rvBadges.adapter = adapter
+
+        b.btnBackBadges.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            startActivity(intent)
+            finish()
+        }
+
+        b.tvBadgesHeaderTitle.text = "Badges"
+        b.tvBadgesTitle.text = "Badges"
+        b.tvBadgesSubtitle.text = "Collect milestones as you run, race, and stay consistent."
     }
 
+    // loading badges
     override fun onResume() {
         super.onResume()
         val uid = auth.currentUser?.uid ?: run { finish(); return }
@@ -47,17 +62,26 @@ class BadgesActivity : AppCompatActivity() {
                         elapsedMs = d.getLong("elapsedMs") ?: 0L
                     )
                 }
-                adapter.submit(evaluateBadges(runs))
+                val badges = evaluateBadges(runs)
+                adapter.submit(badges)
+                updateSummary(badges)
             }
             .addOnFailureListener {
-                adapter.submit(evaluateBadges(emptyList()))
+                val badges = evaluateBadges(emptyList())
+                adapter.submit(badges)
+                updateSummary(badges)
             }
     }
 
-    // -------- Badge definitions (fun style) --------
+    // summary text
+    private fun updateSummary(badges: List<BadgeRow>) {
+        val total = badges.size
+        val earned = badges.count { it.earned }
+        b.tvBadgesSummary.text = "You’ve unlocked $earned of $total badges so far. Keep going!"
+    }
 
+    // badge definitions (fun style)
     private fun badgeDefs(): List<BadgeDef> = listOf(
-        // First steps
         BadgeDef(
             id = "first_run",
             title = "First Run",
@@ -65,8 +89,6 @@ class BadgesActivity : AppCompatActivity() {
             emoji = "🏁",
             condition = "first_run"
         ),
-
-        // Single-run distance milestones
         BadgeDef(
             id = "mile_one",
             title = "One Miler",
@@ -99,8 +121,6 @@ class BadgesActivity : AppCompatActivity() {
             condition = "distance_once",
             distanceMiles = 6.0
         ),
-
-        // ⏱️ Time-based (duration) badges
         BadgeDef(
             id = "half_hour_hero",
             title = "Half-Hour Hero",
@@ -122,8 +142,6 @@ class BadgesActivity : AppCompatActivity() {
             emoji = "🎧",
             condition = "duration_20min_5runs"
         ),
-
-        // Volume / consistency
         BadgeDef(
             id = "weekly_15",
             title = "Mileage Beast",
@@ -146,8 +164,6 @@ class BadgesActivity : AppCompatActivity() {
             emoji = "🎉",
             condition = "weekend_warrior"
         ),
-
-        // Time-of-day energy
         BadgeDef(
             id = "early_bird",
             title = "Ultra Early Bird",
@@ -171,8 +187,6 @@ class BadgesActivity : AppCompatActivity() {
             emoji = "🌙",
             condition = "night_owl_3"
         ),
-
-        // Streaks
         BadgeDef(
             id = "streak7",
             title = "Streak Queen",
@@ -182,10 +196,8 @@ class BadgesActivity : AppCompatActivity() {
         )
     )
 
-    // -------- Evaluation logic --------
-
+    // evaluation logic
     private fun evaluateBadges(runs: List<RunPoint>): List<BadgeRow> {
-        // Decorated runs with LocalDate + hour so we can do date math cleanly
         data class DecoratedRun(
             val miles: Double,
             val elapsedMs: Long,
@@ -206,15 +218,13 @@ class BadgesActivity : AppCompatActivity() {
         val dates = decorated.map { it.date }.toSet()
         val today = LocalDate.now(tz)
 
-        // --- Basic milestones ---
-        val earnedFirst       = decorated.isNotEmpty()
-        val earned1Mile       = decorated.any { it.miles >= 1.0 - 1e-6 }
-        val earned5k          = decorated.any { it.miles >= 3.1 - 1e-6 }
-        val earned10k         = decorated.any { it.miles >= 6.2 - 1e-6 }
-        val earnedLong6       = decorated.any { it.miles >= 6.0 - 1e-6 }
-        val earnedUltraEarly  = decorated.any { it.hour < 6 }
+        val earnedFirst      = decorated.isNotEmpty()
+        val earned1Mile      = decorated.any { it.miles >= 1.0 - 1e-6 }
+        val earned5k         = decorated.any { it.miles >= 3.1 - 1e-6 }
+        val earned10k        = decorated.any { it.miles >= 6.2 - 1e-6 }
+        val earnedLong6      = decorated.any { it.miles >= 6.0 - 1e-6 }
+        val earnedUltraEarly = decorated.any { it.hour < 6 }
 
-        // --- Duration-based badges ---
         val earned30min = decorated.any { it.elapsedMs >= 30L * 60L * 1000L }
         val earned60min = decorated.any { it.elapsedMs >= 60L * 60L * 1000L }
 
@@ -225,20 +235,17 @@ class BadgesActivity : AppCompatActivity() {
         val long20minRuns14 = recentDuration14.count { it.elapsedMs >= 20L * 60L * 1000L }
         val earned20x5 = long20minRuns14 >= 5
 
-        // --- 7-day mileage (weekly_15) ---
         val cutoff7 = today.minusDays(6)
         val miles7 = decorated
             .filter { !it.date.isBefore(cutoff7) && !it.date.isAfter(today) }
             .sumOf { it.miles }
         val earnedWeekly15 = miles7 >= 15.0 - 1e-6
 
-        // --- 30-day run count (ten_runs_30) ---
         val cutoff30 = today.minusDays(29)
         val runs30 = decorated
             .count { !it.date.isBefore(cutoff30) && !it.date.isAfter(today) }
         val earnedTenRuns30 = runs30 >= 10
 
-        // --- Weekend Warrior (last 4 weeks) ---
         val cutoff28 = today.minusDays(27)
         val weekendDays = decorated
             .filter { !it.date.isBefore(cutoff28) && !it.date.isAfter(today) }
@@ -251,7 +258,6 @@ class BadgesActivity : AppCompatActivity() {
             .size
         val earnedWeekendWarrior = weekendDays >= 4
 
-        // --- Early Bird 3 & Night Owl 3 (last 14 days) ---
         val cutoff14 = today.minusDays(13)
         val recent14 = decorated.filter {
             !it.date.isBefore(cutoff14) && !it.date.isAfter(today)
@@ -263,7 +269,6 @@ class BadgesActivity : AppCompatActivity() {
         val earnedEarly3 = earlyRuns14 >= 3
         val earnedNight3 = nightRuns14 >= 3
 
-        // --- Streak 7 (7 distinct days in last 10) ---
         val cutoff10 = today.minusDays(9)
         val distinctRecent = dates.count {
             !it.isBefore(cutoff10) && !it.isAfter(today)
@@ -277,11 +282,9 @@ class BadgesActivity : AppCompatActivity() {
             "distance_once:6.2"    to earned10k,
             "distance_once:6.0"    to earnedLong6,
             "early_bird"           to earnedUltraEarly,
-
             "duration_once_30"     to earned30min,
             "duration_once_60"     to earned60min,
             "duration_20min_5runs" to earned20x5,
-
             "miles_last7:15.0"     to earnedWeekly15,
             "runs_last30"          to earnedTenRuns30,
             "weekend_warrior"      to earnedWeekendWarrior,

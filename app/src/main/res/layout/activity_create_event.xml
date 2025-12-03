@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFF8F2"
     android:padding="16dp">
 
     <LinearLayout
@@ -9,88 +11,218 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Create Event"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp" />
-
-        <EditText
-            android:id="@+id/editEventTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Event title" />
-
-        <EditText
-            android:id="@+id/editEventDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Description (optional)"
-            android:layout_marginTop="8dp"
-            android:minLines="2"
-            android:gravity="top" />
-
-        <EditText
-            android:id="@+id/editEventAddress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Address / location"
-            android:layout_marginTop="8dp" />
-
-        <!-- Date + Time row -->
+        <!-- header bar -->
         <LinearLayout
+            android:id="@+id/headerCreateEvent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="12dp">
+            android:paddingBottom="8dp"
+            android:gravity="center_vertical">
 
-            <Button
-                android:id="@+id/buttonPickDate"
-                android:layout_width="0dp"
+            <ImageButton
+                android:id="@+id/btnBackCreateEvent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Pick date" />
+                android:background="@android:color/transparent"
+                android:padding="4dp"
+                android:src="@drawable/ic_back_arrow"
+                android:contentDescription="Back" />
 
-            <Button
-                android:id="@+id/buttonPickTime"
+            <TextView
+                android:id="@+id/tvCreateEventHeaderTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:text="Pick time" />
+                android:text="Create event"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/vt323"
+                android:textColor="#B64D4D" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/textSelectedDateTime"
+        <!-- event card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No date/time selected"
-            android:layout_marginTop="8dp" />
+            android:backgroundTint="#FFFFFF"
+            android:padding="16dp"
+            app:cardCornerRadius="20dp"
+            app:strokeColor="#F3D9C7"
+            app:strokeWidth="1dp"
+            android:elevation="2dp">
 
-        <!-- Buttons row -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="20dp">
-
-            <Button
-                android:id="@+id/buttonCreateEvent"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Create" />
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/buttonCancel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="Cancel" />
-        </LinearLayout>
+                <!-- title + subtitle -->
+                <TextView
+                    android:id="@+id/tvCreateEventTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Host a run"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/vt323"
+                    android:textColor="#B64D4D"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tvCreateEventSubtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Set a time, place, and invite Racers to join you."
+                    android:textSize="18sp"
+                    android:fontFamily="@font/vt323"
+                    android:textColor="#444444"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- event title -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Event title"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="#B64D4D"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editEventTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/vt323"
+                        android:textColor="#2D2D2D"
+                        android:inputType="textCapWords" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- description -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Description (optional)"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="#B64D4D"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editEventDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minLines="2"
+                        android:maxLines="4"
+                        android:gravity="top"
+                        android:fontFamily="@font/vt323"
+                        android:textColor="#2D2D2D"
+                        android:inputType="textMultiLine" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- address / location -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Address / location"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="#B64D4D"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editEventAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/vt323"
+                        android:textColor="#2D2D2D"
+                        android:inputType="textCapWords" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- date + time row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonPickDate"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Pick date"
+                        android:textAllCaps="false"
+                        android:fontFamily="@font/vt323"
+                        android:textColor="@android:color/white"
+                        app:backgroundTint="#B64D4D" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonPickTime"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="Pick time"
+                        android:textAllCaps="false"
+                        android:fontFamily="@font/vt323"
+                        android:textColor="@android:color/white"
+                        app:backgroundTint="#B64D4D" />
+                </LinearLayout>
+
+                <!-- selected date/time label -->
+                <TextView
+                    android:id="@+id/textSelectedDateTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No date/time selected"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/vt323"
+                    android:textColor="#6B2C2C"
+                    android:layout_marginTop="8dp" />
+
+                <!-- buttons row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="20dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonCreateEvent"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Create"
+                        android:textAllCaps="false"
+                        android:fontFamily="@font/vt323"
+                        android:textColor="@android:color/white"
+                        app:backgroundTint="#B64D4D" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonCancel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="Cancel"
+                        android:textAllCaps="false"
+                        android:fontFamily="@font/vt323"
+                        android:textColor="#B64D4D"
+                        app:backgroundTint="#FFE5CC" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 </ScrollView>

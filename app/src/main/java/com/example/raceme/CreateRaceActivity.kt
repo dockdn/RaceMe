@@ -12,24 +12,34 @@ import kotlin.concurrent.thread
 
 class CreateRaceActivity : BaseActivity() {
 
+    // view binding and firebase
     private lateinit var b: ActivityCreateRaceBinding
     private val db by lazy { FirebaseFirestore.getInstance() }
     private val auth by lazy { FirebaseAuth.getInstance() }
 
+    // lifecycle: onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityCreateRaceBinding.inflate(layoutInflater)
         setContentView(b.root)
 
+        // handle back button
+        b.btnBackCreateRace.setOnClickListener {
+            finish()
+        }
+
+        // handle cancel
         b.btnCancel.setOnClickListener {
             finish()
         }
 
+        // handle save
         b.btnSave.setOnClickListener {
             saveRace()
         }
     }
 
+    // validate input and start save flow
     private fun saveRace() {
         val name = b.inputName.text.toString().trim()
         val description = b.inputDescription.text.toString().trim()
@@ -60,7 +70,7 @@ class CreateRaceActivity : BaseActivity() {
         val ownerUid = user.uid
         val ownerName = user.displayName ?: user.email ?: "Unknown"
 
-        // If no address given, just save without coords
+        // if no address given, just save without coords
         if (locationText.isBlank()) {
             saveRaceToFirestore(
                 name = name,
@@ -74,7 +84,7 @@ class CreateRaceActivity : BaseActivity() {
                 startLng = null
             )
         } else {
-            // Geocode on background thread → then save
+            // geocode on background thread, then save
             geocodeAndSave(
                 name = name,
                 description = description,
@@ -87,6 +97,7 @@ class CreateRaceActivity : BaseActivity() {
         }
     }
 
+    // geocode address string into coordinates, then save
     private fun geocodeAndSave(
         name: String,
         description: String,
@@ -146,6 +157,7 @@ class CreateRaceActivity : BaseActivity() {
         }
     }
 
+    // write track to Firestore
     private fun saveRaceToFirestore(
         name: String,
         description: String,
@@ -168,12 +180,12 @@ class CreateRaceActivity : BaseActivity() {
             "type" to ""
         )
 
-        // Text version of the address
+        // text version of the address
         if (!locationName.isNullOrBlank()) {
             data["locationName"] = locationName
         }
 
-        // Real coordinates if geocoding worked
+        // real coordinates if geocoding worked
         if (startLat != null && startLng != null) {
             data["startLat"] = startLat
             data["startLng"] = startLng

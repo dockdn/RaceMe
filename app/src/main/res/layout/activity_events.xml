@@ -3,22 +3,51 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFF8F2"
     android:padding="16dp">
 
-    <!-- Filter: All Events / My Events -->
-    <RadioGroup
-        android:id="@+id/radioGroupFilter"
-        android:layout_width="wrap_content"
+    <!-- Header bar -->
+    <LinearLayout
+        android:id="@+id/headerBar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        android:gravity="center_vertical"
+        android:paddingBottom="12dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_back_chevron"
+            android:tint="#B64D4D"
+            android:padding="6dp" />
+
+        <TextView
+            android:id="@+id/tvEventsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Events"
+            android:textColor="#B64D4D"
+            android:textSize="26sp"
+            android:fontFamily="@font/vt323"
+            android:textStyle="bold"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+    <!-- Filter -->
+    <RadioGroup
+        android:id="@+id/radioGroupFilter"
+        android:layout_below="@id/headerBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <RadioButton
             android:id="@+id/radioAll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="All Events"
+            android:text="Upcoming"
             android:checked="true" />
 
         <RadioButton
@@ -35,18 +64,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/radioGroupFilter"
-        android:layout_above="@id/fabAddEvent"
         android:layout_marginTop="8dp" />
-
-    <!-- FAB to create a new event -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddEvent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
-        app:srcCompat="@drawable/ic_menu_24"
-        android:contentDescription="Create new event" />
 
 </RelativeLayout>

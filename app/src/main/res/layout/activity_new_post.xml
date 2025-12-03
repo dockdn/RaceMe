@@ -13,19 +13,36 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
-        <!-- Header: title + subtitle -->
-        <TextView
-            android:id="@+id/tvNewPostTitle"
-            android:layout_width="wrap_content"
+        <!-- header row with back + title -->
+        <LinearLayout
+            android:id="@+id/headerNewPost"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Create a post"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="#B64D4D"
-            android:fontFamily="@font/vt323"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="4dp">
 
+            <ImageView
+                android:id="@+id/btnBackNewPost"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_back_arrow"
+                android:tint="#B64D4D"
+                android:padding="8dp" />
+
+            <TextView
+                android:id="@+id/tvNewPostTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Create a post"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="#B64D4D"
+                android:fontFamily="@font/vt323"
+                android:layout_marginStart="12dp" />
+        </LinearLayout>
+
+        <!-- subtitle under header -->
         <TextView
             android:id="@+id/tvNewPostSubtitle"
             android:layout_width="wrap_content"
@@ -36,7 +53,7 @@
             android:fontFamily="@font/vt323"
             android:layout_marginBottom="20dp" />
 
-        <!-- Main card -->
+        <!-- main card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Label for text -->
+                <!-- caption label -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -62,7 +79,7 @@
                     android:fontFamily="@font/vt323"
                     android:layout_marginBottom="4dp" />
 
-                <!-- Caption field -->
+                <!-- caption field -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -83,11 +100,10 @@
                         android:padding="10dp"
                         android:textSize="18sp"
                         android:fontFamily="@font/vt323"
-                        android:textColor="#2D2D2D"
-                        android:hint="Tell your followers about your run, how you felt, or a tip…" />
+                        android:textColor="#2D2D2D" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Label for image -->
+                <!-- label for image -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -98,7 +114,7 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="4dp" />
 
-                <!-- Image preview -->
+                <!-- image preview -->
                 <ImageView
                     android:id="@+id/ivPreview"
                     android:layout_width="match_parent"
@@ -109,7 +125,7 @@
                     android:contentDescription="Selected photo preview"
                     android:padding="4dp" />
 
-                <!-- Hint under preview -->
+                <!-- hint under preview -->
                 <TextView
                     android:id="@+id/tvPhotoHint"
                     android:layout_width="match_parent"
@@ -120,7 +136,7 @@
                     android:fontFamily="@font/vt323"
                     android:layout_marginTop="6dp" />
 
-                <!-- Buttons row -->
+                <!-- buttons row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -2,21 +2,25 @@ package com.example.raceme
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import android.widget.ImageView
+import android.widget.RadioGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 
 class EventsActivity : AppCompatActivity() {
 
+    // adapter for event rows
     private lateinit var eventsAdapter: EventsAdapter
+
+    // firestore
     private val db = FirebaseFirestore.getInstance()
     private val eventsRef = db.collection("events")
 
+    // listeners
     private var allEventsListener: ListenerRegistration? = null
     private var myEventsListener: ListenerRegistration? = null
 
@@ -27,20 +31,26 @@ class EventsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_events)
 
+        // ui refs
+        val btnBack = findViewById<ImageView>(R.id.btnBack)
         val radioGroup = findViewById<RadioGroup>(R.id.radioGroupFilter)
         val recycler = findViewById<RecyclerView>(R.id.recyclerEvents)
-        val fabAddEvent = findViewById<FloatingActionButton>(R.id.fabAddEvent)
 
-        eventsAdapter = EventsAdapter { event ->
-            // Optional: open details screen here
+        // back button
+        btnBack.setOnClickListener {
+            finish()
         }
+
+        // adapter + list setup
+        eventsAdapter = EventsAdapter {}
 
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = eventsAdapter
 
-        // Show all events
+        // show upcoming events
         startAllEventsListener()
 
+        // filter toggle
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.radioAll -> {
@@ -53,37 +63,42 @@ class EventsActivity : AppCompatActivity() {
                 }
             }
         }
-
-        // FAB: open Create Event screen
-        fabAddEvent.setOnClickListener {
-            val intent = Intent(this, CreateEventActivity::class.java)
-            startActivity(intent)
-        }
     }
 
+    // load upcoming all events
     private fun startAllEventsListener() {
         if (allEventsListener != null) return
 
+        val nowMs = System.currentTimeMillis()
+
         allEventsListener = eventsRef
             .orderBy("startTime")
-            .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) return@addSnapshotListener
-                val events = snapshot.toObjects(RaceEvent::class.java)
+            .addSnapshotListener { snap, err ->
+                if (err != null || snap == null) return@addSnapshotListener
+
+                val events = snap.toObjects(RaceEvent::class.java)
+                    .filter { it.startTime?.toDate()?.time ?: 0 >= nowMs }
+
                 eventsAdapter.submitList(events)
             }
     }
 
+    // load upcoming events you're attending
     private fun startMyEventsListener() {
         val uid = currentUserId ?: return
-
         if (myEventsListener != null) return
+
+        val nowMs = System.currentTimeMillis()
 
         myEventsListener = eventsRef
             .whereArrayContains("interestedUserIds", uid)
             .orderBy("startTime")
-            .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) return@addSnapshotListener
-                val events = snapshot.toObjects(RaceEvent::class.java)
+            .addSnapshotListener { snap, err ->
+                if (err != null || snap == null) return@addSnapshotListener
+
+                val events = snap.toObjects(RaceEvent::class.java)
+                    .filter { it.startTime?.toDate()?.time ?: 0 >= nowMs }
+
                 eventsAdapter.submitList(events)
             }
     }

@@ -5,9 +5,9 @@ import android.app.TimePickerDialog
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -15,8 +15,9 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class CreateEventActivity : AppCompatActivity() {
+class CreateEventActivity : BaseActivity() {
 
+    // views
     private lateinit var editTitle: EditText
     private lateinit var editDescription: EditText
     private lateinit var editAddress: EditText
@@ -25,17 +26,21 @@ class CreateEventActivity : AppCompatActivity() {
     private lateinit var textSelectedDateTime: TextView
     private lateinit var buttonCreate: Button
     private lateinit var buttonCancel: Button
+    private lateinit var btnBackCreateEvent: ImageButton
 
+    // date/time + firestore
     private val calendar: Calendar = Calendar.getInstance()
     private var selectedTimestamp: Timestamp? = null
 
     private val db = FirebaseFirestore.getInstance()
     private val eventsRef = db.collection("events")
 
+    // lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_event)
 
+        // find views
         editTitle = findViewById(R.id.editEventTitle)
         editDescription = findViewById(R.id.editEventDescription)
         editAddress = findViewById(R.id.editEventAddress)
@@ -44,14 +49,23 @@ class CreateEventActivity : AppCompatActivity() {
         textSelectedDateTime = findViewById(R.id.textSelectedDateTime)
         buttonCreate = findViewById(R.id.buttonCreateEvent)
         buttonCancel = findViewById(R.id.buttonCancel)
+        btnBackCreateEvent = findViewById(R.id.btnBackCreateEvent)
 
+        // handle back button
+        btnBackCreateEvent.setOnClickListener {
+            finish()
+        }
+
+        // handle date/time pickers
         buttonPickDate.setOnClickListener { showDatePicker() }
         buttonPickTime.setOnClickListener { showTimePicker() }
 
+        // handle create / cancel
         buttonCreate.setOnClickListener { createEvent() }
         buttonCancel.setOnClickListener { finish() }
     }
 
+    // show date picker dialog
     private fun showDatePicker() {
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
@@ -65,6 +79,7 @@ class CreateEventActivity : AppCompatActivity() {
         }, year, month, day).show()
     }
 
+    // show time picker dialog
     private fun showTimePicker() {
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
@@ -76,6 +91,7 @@ class CreateEventActivity : AppCompatActivity() {
         }, hour, minute, false).show()
     }
 
+    // update selected date + time label
     private fun updateSelectedDateTime() {
         selectedTimestamp = Timestamp(calendar.time)
         val formatter = SimpleDateFormat("MMM dd, yyyy h:mm a", Locale.getDefault())
@@ -83,6 +99,7 @@ class CreateEventActivity : AppCompatActivity() {
         textSelectedDateTime.text = "Selected: $formatted"
     }
 
+    // create event document in Firestore
     private fun createEvent() {
         val title = editTitle.text.toString().trim()
         val description = editDescription.text.toString().trim()
@@ -111,6 +128,8 @@ class CreateEventActivity : AppCompatActivity() {
         }
 
         val docRef = eventsRef.document()
+
+        // build event model
         val event = RaceEvent(
             id = docRef.id,
             title = title,
@@ -122,10 +141,11 @@ class CreateEventActivity : AppCompatActivity() {
             interestedUserIds = emptyList()
         )
 
+        // save event
         docRef.set(event)
             .addOnSuccessListener {
                 Toast.makeText(this, "Event created!", Toast.LENGTH_SHORT).show()
-                finish() // go back to EventsActivity
+                finish()
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_SHORT).show()

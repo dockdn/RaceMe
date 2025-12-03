@@ -10,22 +10,30 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class FriendRequestsActivity : BaseActivity() {
 
+    // view binding and firebase
     private lateinit var binding: ActivityFriendRequestsBinding
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
     private val requests = mutableListOf<FriendRequest>()
     private lateinit var adapter: FriendRequestsAdapter
 
+    // lifecycle: onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFriendRequestsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // back button in header
+        binding.btnBackFriendRequests.setOnClickListener {
+            finish()
+        }
+
+        // setup recycler and adapter
         adapter = FriendRequestsAdapter(requests, ::acceptRequest, ::rejectRequest)
         binding.rvIncomingRequests.layoutManager = LinearLayoutManager(this)
         binding.rvIncomingRequests.adapter = adapter
 
-        // Send friend request by email
+        // send friend request by email
         binding.btnSendRequest.setOnClickListener {
             val toEmail = binding.etFriendUid.text.toString().trim()
             sendFriendRequest(toEmail)
@@ -34,7 +42,7 @@ class FriendRequestsActivity : BaseActivity() {
         loadIncomingRequests()
     }
 
-    // -------------------- SEND FRIEND REQUEST --------------------
+    // send friend request
     private fun sendFriendRequest(toEmail: String) {
         val fromUid = auth.currentUser?.uid
         val fromEmail = auth.currentUser?.email
@@ -53,7 +61,6 @@ class FriendRequestsActivity : BaseActivity() {
             return
         }
 
-        // Find the user by email
         db.collection("users")
             .whereEqualTo("email", toEmail)
             .get()
@@ -65,7 +72,6 @@ class FriendRequestsActivity : BaseActivity() {
 
                 val toUid = snapshot.documents[0].id
 
-                // Check if a request already exists
                 db.collection("friendRequests")
                     .whereEqualTo("fromUid", fromUid)
                     .whereEqualTo("toUid", toUid)
@@ -99,7 +105,7 @@ class FriendRequestsActivity : BaseActivity() {
             }
     }
 
-    // -------------------- LOAD INCOMING REQUESTS --------------------
+    // load incoming requests
     private fun loadIncomingRequests() {
         val currentUid = auth.currentUser?.uid ?: return
         db.collection("friendRequests")
@@ -127,14 +133,13 @@ class FriendRequestsActivity : BaseActivity() {
             }
     }
 
-    // -------------------- ACCEPT REQUEST --------------------
+    // accept request
     private fun acceptRequest(request: FriendRequest) {
         val currentUid = auth.currentUser?.uid ?: return
         val requestRef = db.collection("friendRequests").document(request.id)
 
         requestRef.update("status", "accepted")
             .addOnSuccessListener {
-                // Add each other to friends arrays
                 db.collection("users").document(currentUid)
                     .update("friends", FieldValue.arrayUnion(request.fromUid))
                     .addOnFailureListener {
@@ -162,7 +167,7 @@ class FriendRequestsActivity : BaseActivity() {
             }
     }
 
-    // -------------------- REJECT REQUEST --------------------
+    // reject request
     private fun rejectRequest(request: FriendRequest) {
         db.collection("friendRequests").document(request.id)
             .update("status", "rejected")

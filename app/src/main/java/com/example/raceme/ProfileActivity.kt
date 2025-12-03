@@ -28,7 +28,12 @@ class ProfileActivity : AppCompatActivity() {
             return
         }
 
-        // Prefill from Firestore if available, else from Auth
+        // back button
+        b.btnBack.setOnClickListener {
+            finish()
+        }
+
+        // prefill profile fields from Firestore (or Auth as fallback)
         db.collection("users").document(u.uid)
             .get()
             .addOnSuccessListener { snap ->
@@ -42,6 +47,7 @@ class ProfileActivity : AppCompatActivity() {
                 b.inputDisplayName.setText(name)
             }
 
+        // save click handler
         b.btnSave.setOnClickListener {
             val name = b.inputDisplayName.text?.toString()?.trim().orEmpty()
             val bio  = b.inputBio.text?.toString()?.trim().orEmpty()
@@ -49,25 +55,27 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    // save profile to Firestore and FirebaseAuth
     private fun saveProfile(name: String, bio: String) {
         val u = auth.currentUser ?: run {
             Toast.makeText(this, "Not signed in", Toast.LENGTH_LONG).show()
             return
         }
 
-        // 1) Save profile fields to Firestore
         val data = mapOf(
             "displayName" to name,
             "bio" to bio,
             "updatedAt" to FieldValue.serverTimestamp()
         )
+
         db.collection("users").document(u.uid)
             .set(data, SetOptions.merge())
             .addOnSuccessListener {
-                // 2) Update Auth displayName so FirebaseAuth.currentUser.displayName matches
-                val req = userProfileChangeRequest { displayName = name }
+                val req = userProfileChangeRequest {
+                    displayName = name
+                }
+
                 u.updateProfile(req).addOnCompleteListener {
-                    // 3) Refresh in-memory user and finish
                     u.reload().addOnCompleteListener {
                         Toast.makeText(this, "Profile saved", Toast.LENGTH_SHORT).show()
                         finish()

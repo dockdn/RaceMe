@@ -6,17 +6,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tvHeader"
-        android:text="My Runs and Ratings"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/vt323"
-        android:textColor="#2D2D2D"
-        android:layout_width="wrap_content"
+    <!-- header bar with back arrow + title -->
+    <LinearLayout
+        android:id="@+id/headerBar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
 
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@android:color/transparent"
+            android:padding="4dp"
+            android:contentDescription="Back"
+            android:src="@drawable/ic_back_arrow" />
+
+        <TextView
+            android:id="@+id/tvHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="My Runs and Ratings"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/vt323"
+            android:textColor="#2D2D2D"
+            android:layout_marginStart="4dp" />
+    </LinearLayout>
+
+    <!-- empty state message -->
     <TextView
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
@@ -27,10 +48,13 @@
         android:padding="12dp"
         android:visibility="gone" />
 
+    <!-- list of runs -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRuns"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:clipToPadding="false"
-        android:paddingBottom="8dp"/>
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp" />
 </LinearLayout>

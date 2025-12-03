@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FFF8F2"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
     <LinearLayout
         android:orientation="vertical"
@@ -11,47 +12,45 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Header card -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- header row with back arrow + title -->
+        <LinearLayout
+            android:id="@+id/headerRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="3dp"
-            app:strokeColor="#F1E4DA"
-            app:strokeWidth="1dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:layout_marginBottom="16dp">
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="6dp"
+                android:contentDescription="Back"
+                android:src="@drawable/ic_back_arrow" />
 
-                <TextView
-                    android:text="Edit Profile"
-                    android:textStyle="bold"
-                    android:textSize="26sp"
-                    android:textColor="#B64D4D"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/tvPageTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Edit Profile"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#B64D4D"
+                android:fontFamily="@font/vt323" />
+        </LinearLayout>
 
-                <TextView
-                    android:text="Make it yours ✨"
-                    android:textSize="18sp"
-                    android:textColor="#2D2D2D"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Avatar card -->
+        <!-- avatar card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="20dp"
             app:cardElevation="2dp"
             app:strokeColor="#F1E4DA"
-            app:strokeWidth="1dp">
+            app:strokeWidth="1dp"
+            android:layout_marginBottom="16dp">
 
             <LinearLayout
                 android:padding="16dp"
@@ -74,15 +73,16 @@
                     android:layout_height="wrap_content"
                     android:text="Change photo"
                     android:textAllCaps="false"
-                    android:layout_marginTop="12dp"/>
+                    android:layout_marginTop="12dp"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/vt323" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Form card -->
+        <!-- form card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="2dp"
             app:strokeColor="#F1E4DA"
@@ -97,24 +97,44 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:hint="Display name"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="#B64D4D"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/inputDisplayName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:singleLine="true"/>
+                        android:singleLine="true"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/vt323"
+                        android:textColor="#2D2D2D" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_marginTop="12dp"
                     android:hint="Bio (optional)"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="#B64D4D"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/inputBio"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minLines="3"/>
+                        android:minLines="3"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/vt323"
+                        android:textColor="#2D2D2D" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.button.MaterialButton
@@ -123,18 +143,23 @@
                     android:layout_height="wrap_content"
                     android:text="Save"
                     android:textAllCaps="false"
-                    android:layout_marginTop="16dp"/>
+                    android:layout_marginTop="16dp"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/vt323"
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="#B64D4D" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Status line -->
+        <!-- status line -->
         <TextView
             android:id="@+id/tvStatus"
             android:text=""
             android:textSize="14sp"
             android:textColor="#777777"
             android:layout_marginTop="8dp"
+            android:fontFamily="@font/vt323"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </ScrollView>

@@ -1,45 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#FFF8F2"
     android:padding="16dp">
 
-    <!-- Send Request -->
-    <EditText
-        android:id="@+id/etFriendUid"
+    <!-- header bar -->
+    <LinearLayout
+        android:id="@+id/headerFriendRequests"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Friend Email" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="12dp">
 
-    <Button
-        android:id="@+id/btnSendRequest"
+        <ImageView
+            android:id="@+id/btnBackFriendRequests"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_back_arrow"
+            android:tint="#B64D4D"
+            android:padding="8dp" />
+
+        <TextView
+            android:id="@+id/tvFriendRequestsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Friend requests"
+            android:textColor="#B64D4D"
+            android:textSize="26sp"
+            android:fontFamily="@font/vt323"
+            android:textStyle="bold"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+    <!-- send request card -->
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Send Request"
-        android:layout_marginTop="8dp" />
+        android:backgroundTint="#FFFFFF"
+        android:padding="18dp"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="20dp"
+        app:strokeColor="#F3D9C7"
+        app:strokeWidth="1dp"
+        android:elevation="2dp">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Send a friend request"
+                android:textSize="18sp"
+                android:textColor="#6B2C2C"
+                android:fontFamily="@font/vt323"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etFriendUid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter friend email"
+                android:background="@drawable/retro_bar_bg"
+                android:padding="10dp"
+                android:fontFamily="@font/vt323"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/btnSendRequest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Send request"
+                android:textAllCaps="false"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="#B64D4D"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/vt323"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="16sp"
+                android:textColor="#6B2C2C"
+                android:fontFamily="@font/vt323"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- incoming header -->
     <TextView
-        android:id="@+id/tvStatus"
+        android:id="@+id/tvIncomingHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=""
-        android:layout_marginTop="8dp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Incoming Friend Requests"
+        android:text="Incoming friend requests"
         android:textStyle="bold"
-        android:layout_marginTop="16dp" />
+        android:textSize="20sp"
+        android:textColor="#B64D4D"
+        android:fontFamily="@font/vt323"
+        android:layout_marginBottom="8dp" />
 
+    <!-- incoming requests list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvIncomingRequests"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:paddingTop="8dp"/>
-
+        android:paddingTop="4dp" />
 </LinearLayout>

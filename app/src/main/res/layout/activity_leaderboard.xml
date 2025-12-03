@@ -4,37 +4,91 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#FFF8F2"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tvLeaderboardTitle"
+    <!-- header bar -->
+    <LinearLayout
+        android:id="@+id/headerLeaderboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Leaderboard (Friends Only)"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="8dp"/>
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="12dp">
 
-    <!-- Toggle button to sort -->
-    <Button
-        android:id="@+id/btnSortToggle"
-        android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/btnBackLeaderboard"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_back_chevron"
+            android:tint="#B64D4D"
+            android:padding="6dp" />
+
+        <TextView
+            android:id="@+id/tvLeaderboardTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Friends leaderboard"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#B64D4D"
+            android:fontFamily="@font/vt323"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+    <!-- subtitle / helper text -->
+    <TextView
+        android:id="@+id/tvLeaderboardSubtitle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Sort by Distance"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="8dp"/>
+        android:text="Compare steps and miles with your friends."
+        android:textSize="16sp"
+        android:textColor="#6B2C2C"
+        android:fontFamily="@font/vt323"
+        android:layout_marginBottom="8dp" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
+    <!-- sort toggle row -->
+    <LinearLayout
+        android:id="@+id/sortRow"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        android:layout_marginBottom="8dp"/>
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sort:"
+            android:textSize="18sp"
+            android:textColor="#6B2C2C"
+            android:fontFamily="@font/vt323"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/btnSortToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sort by Distance"
+            android:textAllCaps="false"
+            android:backgroundTint="#B64D4D"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/vt323"
+            android:textSize="18sp" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- leaderboard list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvLeaderboard"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="4dp" />
 </LinearLayout>
