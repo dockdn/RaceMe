@@ -216,7 +216,7 @@ Examples:
 
 # 📘 Academic Contribution Statement
 
-This project demonstrates mastery in:
+This project demonstrates working knowledge in:
 
 * Android UI design and event handling
 * Kotlin language fundamentals
@@ -228,7 +228,7 @@ This project demonstrates mastery in:
 
 ---
 
-# 📚 Future Enhancements (Optional Section)
+# 📚 Future Enhancements
 
 * Calender API
 * Google Map Overlay
