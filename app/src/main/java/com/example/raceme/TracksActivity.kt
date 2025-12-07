@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.raceme.databinding.ActivityTracksBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-
 class TracksActivity : BaseActivity() {
     private lateinit var b: ActivityTracksBinding
     private val db by lazy { FirebaseFirestore.getInstance() }
@@ -21,8 +20,8 @@ class TracksActivity : BaseActivity() {
         b = ActivityTracksBinding.inflate(layoutInflater)
         setContentView(b.root)
 
+        // Create the adapter
         adapter = TracksAdapter { track ->
-            // Return selection to the caller (StartRunActivity)
             val data = Intent()
                 .putExtra("selected_track_name", track.name)
                 .putExtra("selected_public_race_id", track.id)
@@ -33,6 +32,7 @@ class TracksActivity : BaseActivity() {
         b.rvTracks.layoutManager = LinearLayoutManager(this)
         b.rvTracks.adapter = adapter
 
+        // Search bar listener to filter the list in real-time
         b.inputSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, st: Int, c: Int, a: Int) {}
@@ -44,15 +44,16 @@ class TracksActivity : BaseActivity() {
         fetchPublicTracks()
     }
 
+    // Retrieves all public tracks, converts Firestore documents into Track objects
     private fun fetchPublicTracks() {
         db.collection("publicRaces")
             .orderBy("name", Query.Direction.ASCENDING)
             .addSnapshotListener { snap, err ->
+                // Handle any Firestore loading errors
                 if (err != null) {
                     Toast.makeText(this, err.message ?: "Failed to load tracks", Toast.LENGTH_LONG).show()
                     return@addSnapshotListener
                 }
-
                 val list = snap?.documents?.map { doc ->
                     Track(
                         id = doc.id,
@@ -68,6 +69,7 @@ class TracksActivity : BaseActivity() {
                     )
                 }.orEmpty()
 
+                // Update the adapter with the latest list
                 adapter.setItems(list)
             }
     }

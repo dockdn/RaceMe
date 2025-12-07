@@ -80,7 +80,7 @@ class BadgesActivity : BaseActivity() {
         b.tvBadgesSummary.text = "You’ve unlocked $earned of $total badges so far. Keep going!"
     }
 
-    // badge definitions (fun style)
+    // badge definitions
     private fun badgeDefs(): List<BadgeDef> = listOf(
         BadgeDef(
             id = "first_run",
@@ -292,6 +292,8 @@ class BadgesActivity : BaseActivity() {
             "night_owl_3"          to earnedNight3,
             "streak7"              to earnedStreak7
         )
+
+        // return badges to user
 
         return badgeDefs().map { def ->
             val key = when (def.condition) {

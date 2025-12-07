@@ -17,17 +17,36 @@ class RegisterActivity : BaseActivity() {
         b = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(b.root)
 
+        // CREATE ACCOUNT BUTTON
+
         b.btnCreateAccount.setOnClickListener {
             val name = b.inputName.text?.toString()?.trim().orEmpty()
             val email = b.inputEmail.text?.toString()?.trim().orEmpty()
             val pw = b.inputPassword.text?.toString().orEmpty()
             val confirm = b.inputConfirm.text?.toString().orEmpty()
 
+            // basic email / password checks
+
             if (email.isEmpty() || pw.isEmpty()) {
-                toast("Email and password are required"); return@setOnClickListener
+                toast("Email and password are required")
+                return@setOnClickListener
             }
-            if (confirm.isNotEmpty() && pw != confirm) {
-                toast("Passwords don’t match"); return@setOnClickListener
+
+            if (confirm.isEmpty()) {
+                toast("Please confirm your password")
+                return@setOnClickListener
+            }
+
+            if (pw != confirm) {
+                toast("Passwords don’t match")
+                return@setOnClickListener
+            }
+
+            // password strength (at least 8 chars + number or special)
+
+            if (!isStrongPassword(pw)) {
+                toast("Password must be at least 8 characters and include a number or special character")
+                return@setOnClickListener
             }
 
             b.btnCreateAccount.isEnabled = false
@@ -37,10 +56,12 @@ class RegisterActivity : BaseActivity() {
                     val user = result.user
                     if (user == null) {
                         b.btnCreateAccount.isEnabled = true
-                        toast("Account created, but no user returned"); return@addOnSuccessListener
+                        toast("Account created, but no user returned")
+                        return@addOnSuccessListener
                     }
 
                     // UPDATE DISPLAY NAME (WHEN CHANGED)
+
                     if (name.isNotEmpty()) {
                         val profile = userProfileChangeRequest { displayName = name }
                         user.updateProfile(profile)
@@ -67,12 +88,28 @@ class RegisterActivity : BaseActivity() {
                 }
         }
 
+        // LOGIN REDIRECTION
+
         b.linkLogin.setOnClickListener {
             go(LoginActivity::class.java)
             finish()
         }
     }
 
+    // TOAST HELPER
+
     private fun toast(msg: String) =
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+
+    // PASSWORD STRENGTH HELPER
+
+    private fun isStrongPassword(pw: String): Boolean {
+        if (pw.length < 8) return false
+
+        val hasDigit = pw.any { it.isDigit() }
+        val hasSpecial = pw.any { !it.isLetterOrDigit() }
+
+        // at least a digit OR a special character
+        return hasDigit || hasSpecial
+    }
 }

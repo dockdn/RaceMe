@@ -6,22 +6,29 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.raceme.databinding.ItemBadgeBinding
 import com.example.raceme.models.BadgeRow
 
+// adapter for badges list
 class BadgesAdapter : RecyclerView.Adapter<BadgesAdapter.VH>() {
+
+    // backing list + submit helper
     private val items = mutableListOf<BadgeRow>()
 
+    // view holder
     class VH(val b: ItemBadgeBinding) : RecyclerView.ViewHolder(b.root)
 
+    // update list contents
     fun submit(list: List<BadgeRow>) {
         items.clear()
         items.addAll(list)
         notifyDataSetChanged()
     }
 
+    // inflate item layout
     override fun onCreateViewHolder(p: ViewGroup, v: Int): VH {
         val b = ItemBadgeBinding.inflate(LayoutInflater.from(p.context), p, false)
         return VH(b)
     }
 
+    // bind badge data to views
     override fun onBindViewHolder(h: VH, i: Int) {
         val row = items[i]
         h.b.tvEmoji.text = row.def.emoji
@@ -35,5 +42,6 @@ class BadgesAdapter : RecyclerView.Adapter<BadgesAdapter.VH>() {
         h.b.tvDesc.alpha  = if (row.earned) 1f else 0.5f
     }
 
+    // list size
     override fun getItemCount() = items.size
 }

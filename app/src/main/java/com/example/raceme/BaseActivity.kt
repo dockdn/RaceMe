@@ -6,12 +6,12 @@ import com.google.firebase.auth.FirebaseAuth
 
 open class BaseActivity : AppCompatActivity() {
 
-    // simple navigation helper
+    // navigation helper
     protected fun go(target: Class<*>) {
         startActivity(Intent(this, target))
     }
 
-    // simple logout helper
+    // logout helper
     protected fun logout() {
         FirebaseAuth.getInstance().signOut()
         val i = Intent(this, LoginActivity::class.java)

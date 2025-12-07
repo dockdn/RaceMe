@@ -25,7 +25,7 @@
         <!-- Base text size across the app (body-ish) -->
         <item name="android:textSize">20sp</item>
 
-        <!-- Wire our custom text appearances into Material -->
+        <!-- Wire our custom text appearances into imported Material -->
         <item name="textAppearanceHeadline6">@style/TextAppearance.RaceMe.Headline</item>
         <item name="textAppearanceBody1">@style/TextAppearance.RaceMe.Body</item>
 

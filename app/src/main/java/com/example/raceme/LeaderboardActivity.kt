@@ -8,52 +8,62 @@ import com.example.raceme.databinding.ActivityLeaderboardBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlin.math.roundToInt
 
 class LeaderboardActivity : BaseActivity() {
 
-    // view binding + firebase
-    private lateinit var binding: ActivityLeaderboardBinding
-    private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
+    // view + firebase
 
-    // in-memory leaderboard rows
-    private val usersList = mutableListOf<UserStats>()
+    private lateinit var b: ActivityLeaderboardBinding
+    private val auth by lazy { FirebaseAuth.getInstance() }
+    private val db by lazy { FirebaseFirestore.getInstance() }
+
+    // data + adapter
+
+    private val allRows = mutableListOf<LeaderboardUserRow>()
     private lateinit var adapter: LeaderboardAdapter
-
-    // sort mode flag
-    private var sortByDistance = false
+    private var sortByDistance = true   // distance first, steps when toggled
 
     // lifecycle: onCreate
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLeaderboardBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        b = ActivityLeaderboardBinding.inflate(layoutInflater)
+        setContentView(b.root)
 
-        // back button in header
-        binding.btnBackLeaderboard.setOnClickListener {
-            finish()
-        }
+        // header labels
+        b.tvLeaderboardTitle.text = "Friends Leaderboard"
+        b.tvLeaderboardSubtitle.text = "Compare steps and miles with your friends."
 
-        // setup recycler + adapter
-        adapter = LeaderboardAdapter(usersList, auth.currentUser?.uid ?: "")
-        binding.rvLeaderboard.layoutManager = LinearLayoutManager(this)
-        binding.rvLeaderboard.adapter = adapter
+        // recycler setup
+        adapter = LeaderboardAdapter(mutableListOf())
+        b.rvLeaderboard.layoutManager = LinearLayoutManager(this)
+        b.rvLeaderboard.adapter = adapter
 
-        // sort toggle button
-        binding.btnSortToggle.setOnClickListener {
-            sortByDistance = !sortByDistance
-            binding.btnSortToggle.text = if (sortByDistance) {
-                "Sort by Steps"
-            } else {
-                "Sort by Distance"
+        // radio buttons control sort (distance vs steps)
+        b.rbSortDistance.isChecked = true
+        b.rbSortSteps.isChecked = false
+
+        b.rbSortDistance.setOnCheckedChangeListener { _, checked ->
+            if (checked) {
+                sortByDistance = true
+                applySorting()
             }
-            loadLeaderboard()
         }
 
+        b.rbSortSteps.setOnCheckedChangeListener { _, checked ->
+            if (checked) {
+                sortByDistance = false
+                applySorting()
+            }
+        }
+
+        // load data
         loadLeaderboard()
     }
 
-    // load friends + current user and compute stats
+    // load leaderboard using current user's "friends" array
+
     private fun loadLeaderboard() {
         val currentUid = auth.currentUser?.uid
         if (currentUid == null) {
@@ -61,30 +71,32 @@ class LeaderboardActivity : BaseActivity() {
             return
         }
 
-        binding.progressBar.visibility = View.VISIBLE
-        binding.tvLeaderboardTitle.text = "Loading..."
+        b.progressBar.visibility = View.VISIBLE
+        b.tvLeaderboardTitle.text = "Loading leaderboard…"
 
         db.collection("users").document(currentUid)
             .get()
             .addOnSuccessListener { doc ->
                 val friends = doc.get("friends") as? List<*>
-                val friendUids = friends?.filterIsInstance<String>()?.toMutableList() ?: mutableListOf()
+                val friendUids = friends?.filterIsInstance<String>()?.toMutableList()
+                    ?: mutableListOf()
 
+                // always include me
                 if (!friendUids.contains(currentUid)) {
                     friendUids.add(currentUid)
                 }
 
                 if (friendUids.isEmpty()) {
-                    binding.tvLeaderboardTitle.text = "Friends leaderboard"
-                    binding.tvLeaderboardSubtitle.text = "Add friends to see stats here."
-                    usersList.clear()
-                    adapter.notifyDataSetChanged()
-                    binding.progressBar.visibility = View.GONE
+                    b.tvLeaderboardTitle.text = "Friends Leaderboard"
+                    b.progressBar.visibility = View.GONE
+                    allRows.clear()
+                    adapter.submit(emptyList())
                     return@addOnSuccessListener
                 }
 
+                // Firestore whereIn max 10 items → chunk friend IDs
                 val chunks = friendUids.chunked(10)
-                val combined = mutableListOf<UserStats>()
+                val combined = mutableListOf<LeaderboardUserRow>()
                 var finishedChunks = 0
 
                 for (chunk in chunks) {
@@ -92,56 +104,125 @@ class LeaderboardActivity : BaseActivity() {
                         .whereIn(FieldPath.documentId(), chunk)
                         .get()
                         .addOnSuccessListener { snap ->
-                            val items = snap.documents.mapNotNull { d ->
-                                val name = d.getString("displayName") ?: d.id
+                            val rows = snap.documents.map { d ->
+                                val uid = d.id
+                                val name =
+                                    d.getString("displayName")
+                                        ?: d.getString("email")
+                                        ?: uid.take(6)
+
+                                // lifetime meters → miles (may be off for some users)
+                                val meters = d.getDouble("distanceMeters") ?: 0.0
+                                val miles = meters / 1609.344
+
+                                // steps (already stored on user doc)
                                 val steps = (d.getLong("steps") ?: 0L).toInt()
-                                val distance = d.getDouble("distanceMeters") ?: 0.0
-                                UserStats(name, steps, distance)
+
+                                LeaderboardUserRow(
+                                    uid = uid,
+                                    name = name,
+                                    steps = steps,
+                                    miles = miles
+                                )
                             }
-                            combined.addAll(items)
+                            combined.addAll(rows)
                         }
                         .addOnFailureListener { e ->
                             Toast.makeText(
                                 this,
-                                "Partial load error: ${e.message}",
+                                "Partial leaderboard error: ${e.message}",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
                         .addOnCompleteListener {
                             finishedChunks++
                             if (finishedChunks == chunks.size) {
-                                val sorted = if (sortByDistance) {
-                                    combined.sortedByDescending { it.distance }
-                                } else {
-                                    combined.sortedByDescending { it.steps }
-                                }
-
-                                usersList.clear()
-                                usersList.addAll(sorted)
-                                adapter.notifyDataSetChanged()
-
-                                binding.tvLeaderboardTitle.text = "Friends leaderboard"
-                                binding.tvLeaderboardSubtitle.text =
-                                    if (sorted.isEmpty()) {
-                                        "No stats yet — go log some runs!"
-                                    } else {
-                                        "Sorted by ${if (sortByDistance) "distance" else "steps"}."
-                                    }
-
-                                binding.progressBar.visibility = View.GONE
+                                // after all user docs loaded, fix *my* row using runs
+                                recomputeCurrentUserFromRuns(currentUid, combined)
                             }
                         }
                 }
             }
             .addOnFailureListener { e ->
-                binding.tvLeaderboardTitle.text = "Friends leaderboard"
-                binding.tvLeaderboardSubtitle.text = "Failed to load your data."
-                binding.progressBar.visibility = View.GONE
+                b.tvLeaderboardTitle.text = "Friends Leaderboard"
+                b.progressBar.visibility = View.GONE
                 Toast.makeText(
                     this,
-                    "Error fetching user doc: ${e.message}",
+                    "Error loading friends: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()
             }
+    }
+
+    // recompute *my* lifetime miles + steps from runs (so they are accurate)
+
+    private fun recomputeCurrentUserFromRuns(
+        currentUid: String,
+        baseRows: MutableList<LeaderboardUserRow>
+    ) {
+        db.collection("users").document(currentUid)
+            .collection("runs")
+            .get()
+            .addOnSuccessListener { runsSnap ->
+                var totalMeters = 0.0
+
+                for (d in runsSnap.documents) {
+                    val meters = d.getDouble("distanceMeters")
+                    val miles = d.getDouble("distanceMiles")
+
+                    totalMeters += when {
+                        meters != null -> meters
+                        miles != null -> miles * 1609.344
+                        else -> 0.0
+                    }
+                }
+
+                val milesTotal = totalMeters / 1609.344
+                val stepsApprox = (milesTotal * 2100.0).roundToInt()
+
+                // update my row if present
+                val idx = baseRows.indexOfFirst { it.uid == currentUid }
+                if (idx != -1) {
+                    val old = baseRows[idx]
+                    baseRows[idx] = old.copy(
+                        steps = stepsApprox,
+                        miles = milesTotal
+                    )
+                }
+
+                // now apply sorting + show in UI
+                allRows.clear()
+                allRows.addAll(baseRows)
+                applySorting()
+
+                b.tvLeaderboardTitle.text = "Friends Leaderboard"
+                b.progressBar.visibility = View.GONE
+            }
+            .addOnFailureListener {
+                // if run query fails, just use baseRows as-is
+                allRows.clear()
+                allRows.addAll(baseRows)
+                applySorting()
+
+                b.tvLeaderboardTitle.text = "Friends Leaderboard"
+                b.progressBar.visibility = View.GONE
+            }
+    }
+
+    // sort + update adapter based on current mode
+
+    private fun applySorting() {
+        if (allRows.isEmpty()) {
+            adapter.submit(emptyList())
+            return
+        }
+
+        val sorted = if (sortByDistance) {
+            allRows.sortedByDescending { it.miles }
+        } else {
+            allRows.sortedByDescending { it.steps }
+        }
+
+        adapter.submit(sorted)
     }
 }

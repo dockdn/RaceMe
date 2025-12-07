@@ -17,11 +17,6 @@ data class ChallengeRow(
     val earned: Boolean
 )
 
-/**
- * Catalog of all defined challenges.
- *
- * NOTE: The actual logic for each id lives in ChallengesActivity.
- */
 object ChallengeCatalog {
     val defs = listOf(
         // --- Existing ones ---

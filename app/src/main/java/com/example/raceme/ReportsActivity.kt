@@ -24,6 +24,7 @@ class ReportsActivity : AppCompatActivity() {
 
     private var allRuns: List<RunPoint> = emptyList()
 
+    // activity setup
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val user = auth.currentUser ?: run { finish(); return }
@@ -36,11 +37,13 @@ class ReportsActivity : AppCompatActivity() {
         b.groupRange.setOnCheckedChangeListener { _, _ -> renderCharts() }
     }
 
+    // reload data each time user returns
     override fun onResume() {
         super.onResume()
         loadRunsThenRender()
     }
 
+    // load runs from Firestore then draw charts
     private fun loadRunsThenRender() {
         val uid = auth.currentUser?.uid ?: run { finish(); return }
         db.collection("users").document(uid)
@@ -55,6 +58,7 @@ class ReportsActivity : AppCompatActivity() {
                     val elapsedMs = doc.getLong("elapsedMs") ?: 0L
                     RunPoint(startedMs, distMiles, elapsedMs)
                 }.sortedBy { it.startedAtMs }
+
                 renderCharts()
             }
             .addOnFailureListener {
@@ -63,6 +67,7 @@ class ReportsActivity : AppCompatActivity() {
             }
     }
 
+    // chart styling
     private fun setupChart(chart: com.github.mikephil.charting.charts.BarChart) {
         chart.description.isEnabled = false
         chart.axisRight.isEnabled = false
@@ -75,11 +80,13 @@ class ReportsActivity : AppCompatActivity() {
         chart.animateY(400)
     }
 
+    // switch weekly/monthly
     private fun renderCharts() {
         val weekly = findViewById<RadioButton>(b.rbWeekly.id).isChecked
         if (weekly) renderWeekly() else renderMonthly()
     }
 
+    // calculate + draw weekly data
     private fun renderWeekly() {
         val labels = lastNDaysLabels(7)
         val milesPerDay = DoubleArray(7) { 0.0 }
@@ -102,6 +109,7 @@ class ReportsActivity : AppCompatActivity() {
         updateSummary("This Week", milesPerDay.sum(), minsPerDay.sum(), runsCountInWindow(7))
     }
 
+    // calculate + draw monthly data
     private fun renderMonthly() {
         val labels = lastNDaysLabels(30)
         val milesPerDay = DoubleArray(30) { 0.0 }
@@ -124,6 +132,7 @@ class ReportsActivity : AppCompatActivity() {
         updateSummary("This Month", milesPerDay.sum(), minsPerDay.sum(), runsCountInWindow(30))
     }
 
+    // count how many runs fall in the selected time window
     private fun runsCountInWindow(days: Int): Int {
         val cutoff = LocalDate.now(tz).minusDays((days - 1).toLong())
         return allRuns.count {
@@ -131,6 +140,7 @@ class ReportsActivity : AppCompatActivity() {
         }
     }
 
+    // make date labels for chart X-axis
     private fun lastNDaysLabels(n: Int): List<String> {
         val today = LocalDate.now(tz)
         val start = today.minusDays((n - 1).toLong())
@@ -140,6 +150,7 @@ class ReportsActivity : AppCompatActivity() {
         }
     }
 
+    // apply arrays of values to a chart
     private fun setData(
         chart: com.github.mikephil.charting.charts.BarChart,
         labels: List<String>,
@@ -155,6 +166,7 @@ class ReportsActivity : AppCompatActivity() {
         b.tvEmpty.visibility = if (values.sum() == 0.0) android.view.View.VISIBLE else android.view.View.GONE
     }
 
+    // update summary text at top of screen
     private fun updateSummary(title: String, miles: Double, minutes: Double, runs: Int) {
         b.tvSummaryTitle.text = title
         b.tvTotals.text = String.format("%.2f mi • %.0f min • %d runs", miles, minutes, runs)

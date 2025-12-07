@@ -21,6 +21,8 @@ class LoginActivity : BaseActivity() {
         b = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(b.root)
 
+        // LOGIN BUTTON
+
         b.btnLogin.setOnClickListener {
             val email = b.inputEmail.text.toString().trim()
             val pw = b.inputPassword.text.toString()
@@ -47,8 +49,15 @@ class LoginActivity : BaseActivity() {
         }
 
         // REGISTRATION REDIRECTION
+
         b.linkRegister.setOnClickListener {
             go(RegisterActivity::class.java)
+        }
+
+        // FORGOT PASSWORD LINK
+
+        b.tvForgotPassword.setOnClickListener {
+            go(ForgotPasswordActivity::class.java)
         }
     }
 }

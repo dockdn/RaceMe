@@ -14,7 +14,6 @@ import com.google.firebase.storage.FirebaseStorage
 
 class NewPostActivity : AppCompatActivity() {
 
-    // view binding + firebase
     private lateinit var b: ActivityNewPostBinding
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }

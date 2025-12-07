@@ -1,69 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootEvents"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="#FFF8F2"
     android:padding="16dp">
 
-    <!-- Header bar -->
+    <!-- header bar -->
     <LinearLayout
-        android:id="@+id/headerBar"
+        android:id="@+id/headerEvents"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingBottom="12dp">
+        android:paddingBottom="8dp">
 
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/ic_back_chevron"
-            android:tint="#B64D4D"
-            android:padding="6dp" />
+        <ImageButton
+            android:id="@+id/btnBackEvents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:padding="4dp"
+            android:src="@drawable/ic_back_arrow"
+            android:contentDescription="Back to home" />
 
         <TextView
-            android:id="@+id/tvEventsTitle"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvEventsHeaderTitle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
             android:text="Events"
-            android:textColor="#B64D4D"
-            android:textSize="26sp"
-            android:fontFamily="@font/vt323"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_marginStart="12dp" />
+            android:textColor="#B64D4D"
+            android:fontFamily="@font/vt323" />
     </LinearLayout>
 
-    <!-- Filter -->
-    <RadioGroup
-        android:id="@+id/radioGroupFilter"
-        android:layout_below="@id/headerBar"
-        android:layout_width="wrap_content"
+    <!-- filter + create row -->
+    <LinearLayout
+        android:id="@+id/rowFilterCreate"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
 
-        <RadioButton
-            android:id="@+id/radioAll"
+        <RadioGroup
+            android:id="@+id/radioGroupFilter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="All events"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/radioMy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="My events"
+                android:layout_marginStart="16dp" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/btnCreateEvent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Upcoming"
-            android:checked="true" />
+            android:text="Create"
+            android:textAllCaps="false"
+            android:backgroundTint="#B64D4D"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
 
-        <RadioButton
-            android:id="@+id/radioMy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="My Events"
-            android:layout_marginStart="16dp" />
-    </RadioGroup>
+    <!-- list label -->
+    <TextView
+        android:id="@+id/tvEventsSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Upcoming events"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#B64D4D"
+        android:fontFamily="@font/vt323"
+        android:layout_marginBottom="4dp" />
 
-    <!-- Events List -->
+    <!-- empty state -->
+    <TextView
+        android:id="@+id/tvEventsEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No upcoming events yet — create one to get started!"
+        android:textSize="14sp"
+        android:textColor="#8B3E3E"
+        android:padding="8dp"
+        android:visibility="gone" />
+
+    <!-- events list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerEvents"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/radioGroupFilter"
-        android:layout_marginTop="8dp" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp" />
 
-</RelativeLayout>
+</LinearLayout>

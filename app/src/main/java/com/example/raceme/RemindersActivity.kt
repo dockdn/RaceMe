@@ -19,7 +19,6 @@ import android.text.format.DateFormat
 
 
 class RemindersActivity : BaseActivity() {
-
     private lateinit var b: ActivityRemindersBinding
 
     private val notifPermLauncher =
@@ -29,6 +28,7 @@ class RemindersActivity : BaseActivity() {
             }
         }
 
+    // activity setup
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityRemindersBinding.inflate(layoutInflater)
@@ -56,6 +56,7 @@ class RemindersActivity : BaseActivity() {
         }
     }
 
+    // request notification permission (Android 13+)
     private fun ensureNotificationPermission() {
         if (Build.VERSION.SDK_INT >= 33) {
             val granted = ContextCompat.checkSelfPermission(
@@ -67,12 +68,14 @@ class RemindersActivity : BaseActivity() {
         }
     }
 
+    // read time from TimePicker
     private fun getTime(tp: TimePicker): Pair<Int, Int> {
         val h = if (Build.VERSION.SDK_INT >= 23) tp.hour else tp.currentHour
         val m = if (Build.VERSION.SDK_INT >= 23) tp.minute else tp.currentMinute
         return h to m
     }
 
+    // set TimePicker time
     private fun setTimePickerTime(tp: TimePicker, h: Int, m: Int) {
         if (Build.VERSION.SDK_INT >= 23) {
             tp.hour = h; tp.minute = m
@@ -81,6 +84,7 @@ class RemindersActivity : BaseActivity() {
         }
     }
 
+    // save user’s choice + schedule alarm
     private fun saveReminder(daily: Boolean, hour: Int, min: Int) {
         val prefs = getSharedPreferences("reminders", Context.MODE_PRIVATE)
         prefs.edit()
@@ -94,12 +98,14 @@ class RemindersActivity : BaseActivity() {
         finish()
     }
 
+    // cancel any scheduled reminder
     private fun cancelReminder() {
         val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        am.cancel(buildPendingIntent())  // cancel any existing
+        am.cancel(buildPendingIntent())
         Toast.makeText(this, "Reminder cancelled", Toast.LENGTH_SHORT).show()
     }
 
+    // create repeating alarm (daily or weekly)
     private fun scheduleAlarm(daily: Boolean, hour: Int, min: Int) {
         val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val pi = buildPendingIntent()
@@ -131,7 +137,7 @@ class RemindersActivity : BaseActivity() {
             )
         }
     }
-
+    // build PendingIntent for the reminder notification
     private fun buildPendingIntent(): PendingIntent {
         val intent = Intent(this, ReminderReceiver::class.java)
             .putExtra("title", "Time to run 🏃‍♀️")

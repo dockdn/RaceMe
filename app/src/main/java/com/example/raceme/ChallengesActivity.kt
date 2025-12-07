@@ -18,7 +18,6 @@ import kotlin.math.roundToInt
 class ChallengesActivity : BaseActivity() {
 
     // view + firebase + adapter
-
     private lateinit var b: ActivityChallengesBinding
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }

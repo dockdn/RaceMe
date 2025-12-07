@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
+// receives alarm and shows notification
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val title = intent.getStringExtra("title") ?: "RaceMe"
@@ -31,6 +32,7 @@ class ReminderReceiver : BroadcastReceiver() {
         }
     }
 
+    // create notification channel
     private fun createChannelIfNeeded(ctx: Context, id: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

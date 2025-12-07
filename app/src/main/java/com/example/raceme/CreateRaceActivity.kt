@@ -12,7 +12,6 @@ import kotlin.concurrent.thread
 
 class CreateRaceActivity : BaseActivity() {
 
-    // view binding and firebase
     private lateinit var b: ActivityCreateRaceBinding
     private val db by lazy { FirebaseFirestore.getInstance() }
     private val auth by lazy { FirebaseAuth.getInstance() }

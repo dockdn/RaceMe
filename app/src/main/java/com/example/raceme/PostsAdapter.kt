@@ -9,10 +9,12 @@ import com.example.raceme.models.Post
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+// adapter for Explore posts list
 class PostsAdapter(
     private val onLikeClicked: (Post) -> Unit
 ) : RecyclerView.Adapter<PostsAdapter.VH>() {
 
+    // backing list + submit helper
     private val items = mutableListOf<Post>()
     fun submit(list: List<Post>) {
         items.clear()
@@ -20,13 +22,16 @@ class PostsAdapter(
         notifyDataSetChanged()
     }
 
+    // view holder
     inner class VH(val b: ItemPostBinding) : RecyclerView.ViewHolder(b.root)
 
+    // inflate item layout
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val b = ItemPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return VH(b)
     }
 
+    // bind post data to row views
     override fun onBindViewHolder(holder: VH, position: Int) {
         val p = items[position]
         holder.b.tvName.text = p.userName
@@ -45,5 +50,6 @@ class PostsAdapter(
         holder.b.btnLike.setOnClickListener { onLikeClicked(p) }
     }
 
+    // list size
     override fun getItemCount(): Int = items.size
 }

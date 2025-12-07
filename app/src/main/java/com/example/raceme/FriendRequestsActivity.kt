@@ -10,7 +10,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class FriendRequestsActivity : BaseActivity() {
 
-    // view binding and firebase
     private lateinit var binding: ActivityFriendRequestsBinding
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
