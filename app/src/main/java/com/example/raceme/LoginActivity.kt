@@ -12,17 +12,18 @@ class LoginActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        auth.currentUser?.let {
-//            go(HomeActivity::class.java)
-//            finish()
-//            return
-//        }
+        // *** MINIMAL LOGIN PERSISTENCE ***
+        auth.currentUser?.let {
+            go(HomeActivity::class.java)
+            finish()
+            return
+        }
+        // *********************************
 
         b = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         // LOGIN BUTTON
-
         b.btnLogin.setOnClickListener {
             val email = b.inputEmail.text.toString().trim()
             val pw = b.inputPassword.text.toString()
@@ -49,13 +50,11 @@ class LoginActivity : BaseActivity() {
         }
 
         // REGISTRATION REDIRECTION
-
         b.linkRegister.setOnClickListener {
             go(RegisterActivity::class.java)
         }
 
         // FORGOT PASSWORD LINK
-
         b.tvForgotPassword.setOnClickListener {
             go(ForgotPasswordActivity::class.java)
         }
