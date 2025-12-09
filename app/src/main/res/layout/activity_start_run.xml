@@ -7,19 +7,70 @@
     android:layout_height="match_parent"
     android:background="#FFF8F2">
 
-    <!-- TIMER CARD -->
+    <!-- HEADER WITH BACK ARROW -->
+    <LinearLayout
+        android:id="@+id/headerRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="4dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="6dp"
+            android:contentDescription="Back"
+            android:src="@drawable/ic_back_arrow" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp">
+
+            <TextView
+                android:id="@+id/tvPageTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Live Run"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#B64D4D"
+                android:fontFamily="@font/vt323" />
+
+            <TextView
+                android:id="@+id/tvPageSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Track your time, distance, and pace"
+                android:textSize="13sp"
+                android:textColor="#9C7F6A"
+                android:fontFamily="@font/vt323" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- SESSION CARD (DISTANCE + PACE + TIMER + BUTTONS) DIRECTLY UNDER HEADER -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/timerCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="10dp"
         app:cardCornerRadius="20dp"
-        app:cardElevation="4dp"
+        app:cardElevation="3dp"
         app:strokeColor="#F1E4DA"
         app:strokeWidth="1dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerRow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -28,176 +79,200 @@
             android:padding="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+            <!-- TOP ROW: DISTANCE + PACE -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Distance -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Distance"
+                        android:textSize="13sp"
+                        android:textColor="#777777" />
+
+                    <TextView
+                        android:id="@+id/tvMiles"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0.00 mi"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:textColor="#333333"
+                        android:fontFamily="@font/vt323" />
+                </LinearLayout>
+
+                <!-- Pace -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="end">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pace"
+                        android:textSize="13sp"
+                        android:textColor="#777777" />
+
+                    <TextView
+                        android:id="@+id/tvPace"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-- / mi"
+                        android:textSize="18sp"
+                        android:textColor="#333333"
+                        android:fontFamily="@font/vt323" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- DIVIDER -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:background="#F1E4DA" />
+
+            <!-- TIMER -->
+            <TextView
+                android:id="@+id/tvTimerLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Timer"
+                android:textSize="13sp"
+                android:textColor="#777777"
+                android:fontFamily="@font/vt323" />
 
             <Chronometer
                 android:id="@+id/chronometer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:gravity="center"
-                android:textSize="42sp"
+                android:textSize="38sp"
                 android:textStyle="bold"
                 android:textColor="#B64D4D"
                 android:fontFamily="@font/vt323"
                 android:format="%s" />
 
+            <TextView
+                android:id="@+id/tvTimerHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Start the timer to begin tracking"
+                android:textSize="12sp"
+                android:textColor="#9C7F6A"
+                android:fontFamily="@font/vt323" />
+
+            <!-- BUTTONS -->
             <LinearLayout
                 android:id="@+id/runControls"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:gravity="center"
+                android:layout_marginTop="10dp"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPause"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
+                    android:layout_height="44dp"
                     android:layout_weight="1"
                     android:text="Start"
                     android:textAllCaps="false"
-                    app:cornerRadius="16dp"/>
+                    android:textSize="18sp"
+                    android:fontFamily="@font/vt323"
+                    android:textColor="@android:color/white"
+                    app:cornerRadius="16dp"
+                    app:backgroundTint="#B64D4D" />
 
                 <Space
-                    android:layout_width="12dp"
-                    android:layout_height="1dp"/>
+                    android:layout_width="10dp"
+                    android:layout_height="1dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnStop"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
+                    android:layout_height="44dp"
                     android:layout_weight="1"
                     android:text="Stop"
                     android:textAllCaps="false"
-                    app:cornerRadius="16dp"/>
+                    android:textSize="18sp"
+                    android:fontFamily="@font/vt323"
+                    android:textColor="#B64D4D"
+                    app:cornerRadius="16dp"
+                    app:backgroundTint="#FFFFFF"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#B64D4D" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- TRACK DROPDOWN -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilTrack"
-        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+    <!-- COMPACT TRACK ROW NOW *UNDER* THE CARD -->
+    <LinearLayout
+        android:id="@+id/trackRow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="12dp"
-        android:hint="Select track"
-        app:boxCornerRadiusTopStart="16dp"
-        app:boxCornerRadiusTopEnd="16dp"
-        app:boxCornerRadiusBottomStart="16dp"
-        app:boxCornerRadiusBottomEnd="16dp"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="12dp"
         app:layout_constraintTop_toBottomOf="@id/timerCard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <AutoCompleteTextView
-            android:id="@+id/ddTrack"
+        <TextView
+            android:id="@+id/tvTrackLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Track"
+            android:textSize="14sp"
+            android:textColor="#4A3B33"
+            android:fontFamily="@font/vt323" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilTrack"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="none"
-            android:importantForAutofill="no"
-            android:fontFamily="@font/vt323"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginTop="4dp"
+            android:hint="Select track"
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusBottomEnd="16dp">
 
-    <!-- LIVE MILES READOUT -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/milesCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="12dp"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="3dp"
-        app:strokeColor="#F1E4DA"
-        app:strokeWidth="1dp"
-        app:layout_constraintTop_toBottomOf="@+id/tilTrack"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+            <AutoCompleteTextView
+                android:id="@+id/ddTrack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:importantForAutofill="no"
+                android:fontFamily="@font/vt323" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:text="Distance"
-                android:textColor="#777777"
-                android:textSize="14sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:id="@+id/tvMiles"
-                android:text="0.00 mi"
-                android:textColor="#333333"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/vt323"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- COLLAPSIBLE MENU (your existing) -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/menuCard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="#FFFFFF"
-        app:strokeColor="#F3D9C7"
-        app:strokeWidth="1dp"
-        app:layout_constraintBottom_toTopOf="@+id/fabMenu"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="16dp">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:padding="12dp"
+        <TextView
+            android:id="@+id/tvTrackHint"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Choose a new track or browse public races."
+            android:textSize="12sp"
+            android:textColor="#9C7F6A"
+            android:fontFamily="@font/vt323" />
+    </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnMenuStartRun"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Start Run"
-                android:textAllCaps="false"
-                app:cornerRadius="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnMenuCustomizeRace"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Customize Race"
-                android:textAllCaps="false"
-                app:cornerRadius="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnMenuProfile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Profile"
-                android:textAllCaps="false"
-                app:cornerRadius="12dp"/>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Menu"
-        android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="20dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

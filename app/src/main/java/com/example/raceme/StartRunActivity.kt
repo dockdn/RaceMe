@@ -9,8 +9,6 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.view.View
-import android.view.animation.AlphaAnimation
-import android.view.animation.TranslateAnimation
 import android.widget.ArrayAdapter
 import android.widget.RatingBar
 import android.widget.TextView
@@ -31,27 +29,21 @@ import kotlin.math.roundToInt
 class StartRunActivity : BaseActivity() {
 
     // view + UI state
-
     private lateinit var b: ActivityStartRunBinding
-    private var menuOpen = false
-
     private var isPaused = true
     private var pauseOffset: Long = 0L
     private var startedAtMillis: Long? = null
 
     // firebase
-
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }
 
     // selected track
-
     private var selectedPublicRaceId: String? = null
     private var selectedTrackName: String? = null
     private var selectedType: String? = null
 
     // gps tracking
-
     private lateinit var fused: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private var locationCallback: LocationCallback? = null
@@ -59,22 +51,22 @@ class StartRunActivity : BaseActivity() {
     private var distanceMeters: Double = 0.0
 
     // timer
-
     private val timerHandler = Handler(Looper.getMainLooper())
     private var timerRunnable: Runnable? = null
 
     // permissions
-
     private val locationPermLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grants ->
             val fine = grants[Manifest.permission.ACCESS_FINE_LOCATION] == true
             val coarse = grants[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-            if (fine || coarse) startLocationUpdates()
-            else Toast.makeText(this, "Location permission required", Toast.LENGTH_LONG).show()
+            if (fine || coarse) {
+                startLocationUpdates()
+            } else {
+                Toast.makeText(this, "Location permission required", Toast.LENGTH_LONG).show()
+            }
         }
 
     // track picker for public tracks
-
     private val pickTrack =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { res ->
             if (res.resultCode == RESULT_OK) {
@@ -82,19 +74,21 @@ class StartRunActivity : BaseActivity() {
                 selectedTrackName = data?.getStringExtra("selected_track_name")
                 selectedPublicRaceId = data?.getStringExtra("selected_public_race_id")
                 selectedTrackName?.let { b.ddTrack.setText(it, false) }
-                Toast.makeText(this, "Track selected: ${selectedTrackName ?: ""}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Track selected: ${selectedTrackName ?: ""}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
     // lifecycle: onCreate
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityStartRunBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         // setup GPS client
-
         fused = LocationServices.getFusedLocationProviderClient(this)
         locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1500L)
             .setMinUpdateIntervalMillis(1000L)
@@ -103,7 +97,6 @@ class StartRunActivity : BaseActivity() {
             .build()
 
         // dropdown for tracks
-
         val options = listOf("Start a new track", "Browse public tracks…")
         b.ddTrack.setAdapter(ArrayAdapter(this, android.R.layout.simple_list_item_1, options))
         b.ddTrack.setOnItemClickListener { _, _, position, _ ->
@@ -121,33 +114,32 @@ class StartRunActivity : BaseActivity() {
         selectedTrackName = null
 
         // initialize run UI
-
         b.tvMiles.text = "0.00 mi"
         b.btnPause.text = "Start"
         b.chronometer.base = SystemClock.elapsedRealtime()
         b.chronometer.text = formatElapsedTime(0L)
 
-        // buttons
-
+        // start / pause button
         b.btnPause.setOnClickListener {
-            if (isPaused && startedAtMillis == null) startRun()
-            else onStartPauseClicked()
+            if (isPaused && startedAtMillis == null) {
+                startRun()
+            } else {
+                onStartPauseClicked()
+            }
         }
 
-        b.btnStop.setOnClickListener { stopRunShowSummary() }
-
-        // fab menu
-
-        b.fabMenu.setOnClickListener { toggleMenu() }
-        b.btnMenuStartRun.setOnClickListener {
-            b.btnPause.performClick()
-            toggleMenu(closeOnly = true)
+        // stop button
+        b.btnStop.setOnClickListener {
+            stopRunShowSummary()
         }
-        b.btnMenuCustomizeRace.setOnClickListener { go(CreateRaceActivity::class.java); toggleMenu(closeOnly = true) }
-        b.btnMenuProfile.setOnClickListener { go(ProfileActivity::class.java); toggleMenu(closeOnly = true) }
+
+        // back arrow wiring (if you added it in XML with id btnBack)
+        b.root.findViewById<View?>(R.id.btnBack)?.setOnClickListener {
+            finish()
+        }
     }
 
-    // timer helpers
+    // === TIMER HELPERS ===
 
     private fun formatElapsedTime(elapsedMs: Long): String {
         val totalSeconds = elapsedMs / 1000
@@ -174,7 +166,7 @@ class StartRunActivity : BaseActivity() {
         timerRunnable = null
     }
 
-    // start / pause logic
+    // === RUN LOGIC ===
 
     private fun onStartPauseClicked() {
         if (isPaused) {
@@ -199,7 +191,9 @@ class StartRunActivity : BaseActivity() {
             return
         }
 
-        if (startedAtMillis == null) startedAtMillis = System.currentTimeMillis()
+        if (startedAtMillis == null) {
+            startedAtMillis = System.currentTimeMillis()
+        }
 
         if (pauseOffset == 0L && isPaused) {
             distanceMeters = 0.0
@@ -217,8 +211,10 @@ class StartRunActivity : BaseActivity() {
     }
 
     private fun ensureLocationPermissionThenStart() {
-        val fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-        val coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        val fine =
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        val coarse =
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
         if (fine == PackageManager.PERMISSION_GRANTED || coarse == PackageManager.PERMISSION_GRANTED) {
             startLocationUpdates()
         } else {
@@ -231,7 +227,7 @@ class StartRunActivity : BaseActivity() {
         }
     }
 
-    // GPS tracking
+    // === GPS TRACKING ===
 
     private fun startLocationUpdates() {
         if (locationCallback != null) return
@@ -266,7 +262,7 @@ class StartRunActivity : BaseActivity() {
         b.tvMiles.text = String.format("%.2f mi", shown)
     }
 
-    // stop run, show summary, save
+    // === STOP / SUMMARY / SAVE ===
 
     private fun stopRunShowSummary() {
         val endMs = System.currentTimeMillis()
@@ -298,15 +294,19 @@ class StartRunActivity : BaseActivity() {
             view.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchMakePublic)
 
         val usingPublicTrack = (selectedPublicRaceId != null)
-        if (usingPublicTrack) groupNewTrack.visibility = View.GONE
-        else {
+        if (usingPublicTrack) {
+            groupNewTrack.visibility = View.GONE
+        } else {
             groupNewTrack.visibility = View.VISIBLE
             if (!selectedTrackName.isNullOrBlank() && selectedTrackName != "New Track") {
                 inputName.setText(selectedTrackName)
             }
         }
 
-        val dlg = AlertDialog.Builder(this).setView(view).setCancelable(false).create()
+        val dlg = AlertDialog.Builder(this)
+            .setView(view)
+            .setCancelable(false)
+            .create()
 
         view.findViewById<View>(R.id.btnCancel).setOnClickListener {
             dlg.dismiss()
@@ -331,12 +331,28 @@ class StartRunActivity : BaseActivity() {
 
                 if (switchMakePublic.isChecked) {
                     publishNewTrackThenSave(finalName, desc) {
-                        saveRunToFirestore(startMs, endMs, elapsedMs, miles, pace, quote, rating)
+                        saveRunToFirestore(
+                            startMs,
+                            endMs,
+                            elapsedMs,
+                            miles,
+                            pace,
+                            quote,
+                            rating
+                        )
                         dlg.dismiss()
                     }
                 } else {
                     savePrivateTrackIfNeeded(finalName, desc) {
-                        saveRunToFirestore(startMs, endMs, elapsedMs, miles, pace, quote, rating)
+                        saveRunToFirestore(
+                            startMs,
+                            endMs,
+                            elapsedMs,
+                            miles,
+                            pace,
+                            quote,
+                            rating
+                        )
                         dlg.dismiss()
                     }
                 }
@@ -347,7 +363,6 @@ class StartRunActivity : BaseActivity() {
     }
 
     // publish new track
-
     private fun publishNewTrackThenSave(
         name: String,
         desc: String,
@@ -375,7 +390,6 @@ class StartRunActivity : BaseActivity() {
     }
 
     // save private track
-
     private fun savePrivateTrackIfNeeded(
         name: String,
         desc: String,
@@ -395,8 +409,7 @@ class StartRunActivity : BaseActivity() {
             .addOnFailureListener { onDone() }
     }
 
-    // save run (YOUR MAIN FIX IS HERE — updates leaderboard stats)
-
+    // save run + leaderboard aggregates
     private fun saveRunToFirestore(
         startMs: Long,
         endMs: Long,
@@ -436,8 +449,6 @@ class StartRunActivity : BaseActivity() {
             .collection("runs")
             .add(runDoc)
             .addOnSuccessListener {
-
-                // update leaderboard aggregates (THIS IS WHY YOUR MILES FIXES)
                 val approxSteps = (miles * 2100.0).roundToInt()
 
                 val updates = mapOf(
@@ -497,32 +508,7 @@ class StartRunActivity : BaseActivity() {
         b.tvMiles.text = "0.00 mi"
     }
 
-    // fab menu animation
-
-    private fun toggleMenu(closeOnly: Boolean = false) {
-        if (menuOpen || closeOnly) {
-            val slideOut = TranslateAnimation(0f, 0f, 0f, 40f)
-            slideOut.duration = 140
-            val fadeOut = AlphaAnimation(1f, 0f)
-            fadeOut.duration = 140
-            b.menuCard.startAnimation(slideOut)
-            b.menuCard.startAnimation(fadeOut)
-            b.menuCard.visibility = View.GONE
-            menuOpen = false
-            b.fabMenu.shrink()
-        } else {
-            b.menuCard.visibility = View.VISIBLE
-            val slideIn = TranslateAnimation(0f, 0f, 40f, 0f)
-            slideIn.duration = 140
-            val fadeIn = AlphaAnimation(0f, 1f)
-            fadeIn.duration = 140
-            b.menuCard.startAnimation(slideIn)
-            b.menuCard.startAnimation(fadeIn)
-            b.fabMenu.extend()
-            menuOpen = true
-        }
-    }
-
+    // lifecycle helpers
     override fun onPause() {
         super.onPause()
         if (!isPaused) {
