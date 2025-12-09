@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#FFF8F2">
 
-    <!-- Content container -->
+    <!-- Container -->
     <LinearLayout
         android:orientation="vertical"
         android:padding="16dp"
