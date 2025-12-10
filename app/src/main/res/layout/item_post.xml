@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Top row: name + time -->
+        <!-- Top row: name + time + delete -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,6 +50,17 @@
                 android:textSize="14sp"
                 android:textColor="#777777"
                 android:fontFamily="@font/vt323" />
+
+            <!-- NEW delete button (hidden by default; shown only for own posts) -->
+            <ImageView
+                android:id="@+id/btnDelete"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="8dp"
+                android:contentDescription="Delete post"
+                android:src="@android:drawable/ic_menu_delete"
+                android:tint="#B64D4D"
+                android:visibility="gone" />
         </LinearLayout>
 
         <!-- Post text -->

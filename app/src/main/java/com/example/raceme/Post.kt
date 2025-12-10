@@ -7,7 +7,7 @@ data class Post(
     val userId: String = "",
     val userName: String = "",
     val text: String = "",
-    val imageUrl: String? = null,
+    val imageBase64: String? = null,
     val createdAt: Timestamp? = null,
     val likesCount: Long = 0L
 )

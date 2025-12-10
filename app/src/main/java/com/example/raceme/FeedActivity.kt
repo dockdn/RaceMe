@@ -37,11 +37,21 @@ class FeedActivity : BaseActivity() {
         b.tvFeedTitle.text = "Community feed"
 
         // recycler and adapter
-        adapter = PostsAdapter { post ->
-            toggleLike(post)
-        }
+        val currentUid = auth.currentUser?.uid
+
+        adapter = PostsAdapter(
+            currentUserId = currentUid,
+            onLikeClicked = { post ->
+                toggleLike(post)
+            },
+            onDeleteClicked = { post ->
+                deletePost(post)
+            }
+        )
+
         b.rvPosts.layoutManager = LinearLayoutManager(this)
         b.rvPosts.adapter = adapter
+
 
         // new post button
         b.fabNewPost.setOnClickListener {
@@ -49,11 +59,14 @@ class FeedActivity : BaseActivity() {
         }
 
         // firestore listener - load posts
+            //update: automatically insert document id into respective property
         db.collection("posts")
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snap, _ ->
                 if (snap != null) {
-                    val posts = snap.toObjects(Post::class.java)
+                    val posts = snap.documents.mapNotNull { doc ->
+                        doc.toObject(Post::class.java)?.copy(id = doc.id)
+                    }
                     adapter.submit(posts)
                 }
             }
@@ -91,4 +104,27 @@ class FeedActivity : BaseActivity() {
             null
         }
     }
+
+    // deletePost funtion
+    private fun deletePost(post: Post) {
+        val currentUid = auth.currentUser?.uid ?: return
+        if (post.userId != currentUid) return
+
+        val postId = post.id
+        if (postId.isBlank()) return
+
+        val postDoc = db.collection("posts").document(postId)
+
+        postDoc.delete()
+            .addOnSuccessListener {
+
+            //Toast to confirm
+                // Toast.makeText(this, "Post deleted", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                // Toast to show error
+                // Toast.makeText(this, "Failed to delete post", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 }

@@ -10,14 +10,16 @@ import com.example.raceme.databinding.ActivityNewPostBinding
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
+import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import android.util.Base64
+import java.io.ByteArrayOutputStream
 
 class NewPostActivity : AppCompatActivity() {
 
     private lateinit var b: ActivityNewPostBinding
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }
-    private val storage by lazy { FirebaseStorage.getInstance() }
 
     // selected image uri (if any)
     private var pickedImage: Uri? = null
@@ -30,7 +32,6 @@ class NewPostActivity : AppCompatActivity() {
         }
     }
 
-    // lifecycle: onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityNewPostBinding.inflate(layoutInflater)
@@ -52,7 +53,7 @@ class NewPostActivity : AppCompatActivity() {
         }
     }
 
-    // create post (upload image first if there is one)
+    // create post (encode image if there is one)
     private fun submitPost() {
         val user = auth.currentUser ?: run {
             Toast.makeText(this, "Please sign in", Toast.LENGTH_LONG).show()
@@ -67,12 +68,13 @@ class NewPostActivity : AppCompatActivity() {
 
         b.btnPost.isEnabled = false
 
-        fun createPostDoc(imageUrl: String?) {
+        // imageBase64 == null for text-only posts
+        fun createPostDoc(imageBase64: String?) {
             val doc = hashMapOf(
                 "userId" to user.uid,
                 "userName" to (user.displayName ?: user.email ?: "Racer"),
                 "text" to text,
-                "imageUrl" to imageUrl,
+                "imageBase64" to imageBase64,
                 "createdAt" to Timestamp.now(),
                 "likesCount" to 0L
             )
@@ -98,22 +100,27 @@ class NewPostActivity : AppCompatActivity() {
             // text-only post
             createPostDoc(null)
         } else {
-            // upload image then create post
-            val path = "posts/${user.uid}/${System.currentTimeMillis()}.jpg"
-            storage.reference.child(path)
-                .putFile(image)
-                .continueWithTask { it.result.storage.downloadUrl }
-                .addOnSuccessListener { uri ->
-                    createPostDoc(uri.toString())
-                }
-                .addOnFailureListener { e ->
-                    b.btnPost.isEnabled = true
-                    Toast.makeText(
-                        this,
-                        e.message ?: "Upload failed",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+            // 🔧 NEW: encode image and store in Firestore (no Cloud Storage)
+            try {
+                val input = contentResolver.openInputStream(image)
+                val bitmap = BitmapFactory.decodeStream(input)
+                input?.close()
+
+                val output = ByteArrayOutputStream()
+                // compress so it’s not huge in Firestore
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 40, output)
+                val bytes = output.toByteArray()
+                val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
+
+                createPostDoc(base64)
+            } catch (e: Exception) {
+                b.btnPost.isEnabled = true
+                Toast.makeText(
+                    this,
+                    e.message ?: "Could not process image",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
     }
 }
