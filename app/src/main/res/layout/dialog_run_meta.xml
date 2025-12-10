@@ -17,19 +17,20 @@
         <!-- Title -->
         <TextView
             android:id="@+id/tvTitle"
-            android:text="Track details"
+            android:text="Run Details"
             android:textStyle="bold"
             android:textSize="20sp"
             android:textColor="#B64D4D"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <!-- Name -->
+        <!-- Run / Race Name -->
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputNameLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="Track name"
+            android:hint="Name this run or event"
             app:boxBackgroundMode="outline"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
@@ -43,12 +44,13 @@
                 android:inputType="textCapWords" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Type -->
+        <!-- Address / Location Search -->
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputAddressLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="Type (e.g., Tempo, Easy, Trail)"
+            android:hint="Location (address or place name)"
             app:boxBackgroundMode="outline"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
@@ -56,48 +58,30 @@
             app:boxCornerRadiusBottomEnd="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/inputType"
+                android:id="@+id/inputAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords" />
+                android:minLines="1"
+                android:inputType="textCapSentences|textMultiLine" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Distance (optional) -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:hint="Distance goal (mi) — optional"
-            app:boxBackgroundMode="outline"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/inputDistance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Save as reusable track -->
+        <!-- Reusable Track Switch -->
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/switchSaveTrack"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save this as a reusable track"
+            android:text="Save as reusable track"
             android:layout_marginTop="14dp" />
 
-        <!-- Make public -->
+        <!-- Public / Private Switch -->
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/switchPublic"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Make public (visible to everyone)"
+            android:text="Make public"
             android:layout_marginTop="6dp" />
 
-        <!-- Actions -->
+        <!-- Buttons -->
         <LinearLayout
             android:orientation="horizontal"
             android:gravity="end"

@@ -2,153 +2,211 @@ package com.example.raceme
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.location.Geocoder
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
+import com.example.raceme.databinding.ActivityCreateEventBinding
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlin.concurrent.thread
 
 class CreateEventActivity : BaseActivity() {
 
-    // views
-    private lateinit var editTitle: EditText
-    private lateinit var editDescription: EditText
-    private lateinit var editAddress: EditText
-    private lateinit var buttonPickDate: Button
-    private lateinit var buttonPickTime: Button
-    private lateinit var textSelectedDateTime: TextView
-    private lateinit var buttonCreate: Button
-    private lateinit var buttonCancel: Button
-    private lateinit var btnBackCreateEvent: ImageButton
+    private lateinit var b: ActivityCreateEventBinding
+    private val db by lazy { FirebaseFirestore.getInstance() }
+    private val auth by lazy { FirebaseAuth.getInstance() }
 
-    // date/time + firestore
-    private val calendar: Calendar = Calendar.getInstance()
+    // backing calendar for the event date/time
+    private val eventCal: Calendar = Calendar.getInstance()
     private var selectedTimestamp: Timestamp? = null
 
-    private val db = FirebaseFirestore.getInstance()
-    private val eventsRef = db.collection("events")
-
-    // lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_event)
+        b = ActivityCreateEventBinding.inflate(layoutInflater)
+        setContentView(b.root)
 
-        // find views
-        editTitle = findViewById(R.id.editEventTitle)
-        editDescription = findViewById(R.id.editEventDescription)
-        editAddress = findViewById(R.id.editEventAddress)
-        buttonPickDate = findViewById(R.id.buttonPickDate)
-        buttonPickTime = findViewById(R.id.buttonPickTime)
-        textSelectedDateTime = findViewById(R.id.textSelectedDateTime)
-        buttonCreate = findViewById(R.id.buttonCreateEvent)
-        buttonCancel = findViewById(R.id.buttonCancel)
-        btnBackCreateEvent = findViewById(R.id.btnBackCreateEvent)
+        // back + cancel
+        b.btnBackCreateEvent.setOnClickListener { finish() }
+        b.buttonCancel.setOnClickListener { finish() }
 
-        // handle back button
-        btnBackCreateEvent.setOnClickListener {
-            finish()
-        }
+        // date / time
+        b.buttonPickDate.setOnClickListener { showDatePicker() }
+        b.buttonPickTime.setOnClickListener { showTimePicker() }
 
-        // handle date/time pickers
-        buttonPickDate.setOnClickListener { showDatePicker() }
-        buttonPickTime.setOnClickListener { showTimePicker() }
-
-        // handle create / cancel
-        buttonCreate.setOnClickListener { createEvent() }
-        buttonCancel.setOnClickListener { finish() }
+        // create
+        b.buttonCreateEvent.setOnClickListener { saveEvent() }
     }
 
-    // show date picker dialog
+    // ===== DATE / TIME PICKERS =====
+
     private fun showDatePicker() {
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val year = eventCal.get(Calendar.YEAR)
+        val month = eventCal.get(Calendar.MONTH)
+        val day = eventCal.get(Calendar.DAY_OF_MONTH)
 
         DatePickerDialog(this, { _, y, m, d ->
-            calendar.set(Calendar.YEAR, y)
-            calendar.set(Calendar.MONTH, m)
-            calendar.set(Calendar.DAY_OF_MONTH, d)
-            updateSelectedDateTime()
+            eventCal.set(Calendar.YEAR, y)
+            eventCal.set(Calendar.MONTH, m)
+            eventCal.set(Calendar.DAY_OF_MONTH, d)
+            updateSelectedDateTimeLabel()
         }, year, month, day).show()
     }
 
-    // show time picker dialog
     private fun showTimePicker() {
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute = calendar.get(Calendar.MINUTE)
+        val hour = eventCal.get(Calendar.HOUR_OF_DAY)
+        val minute = eventCal.get(Calendar.MINUTE)
 
-        TimePickerDialog(this, { _, h, m ->
-            calendar.set(Calendar.HOUR_OF_DAY, h)
-            calendar.set(Calendar.MINUTE, m)
-            updateSelectedDateTime()
+        TimePickerDialog(this, { _, h, min ->
+            eventCal.set(Calendar.HOUR_OF_DAY, h)
+            eventCal.set(Calendar.MINUTE, min)
+            eventCal.set(Calendar.SECOND, 0)
+            eventCal.set(Calendar.MILLISECOND, 0)
+            updateSelectedDateTimeLabel()
         }, hour, minute, false).show()
     }
 
-    // update selected date + time label
-    private fun updateSelectedDateTime() {
-        selectedTimestamp = Timestamp(calendar.time)
-        val formatter = SimpleDateFormat("MMM dd, yyyy h:mm a", Locale.getDefault())
-        val formatted = formatter.format(calendar.time)
-        textSelectedDateTime.text = "Selected: $formatted"
+    private fun updateSelectedDateTimeLabel() {
+        val fmt = java.text.SimpleDateFormat("EEE, MMM d • h:mm a", Locale.getDefault())
+        val label = fmt.format(eventCal.time)
+        b.textSelectedDateTime.text = label
+
+        selectedTimestamp = Timestamp(eventCal.time)
     }
 
-    // create event document in Firestore
-    private fun createEvent() {
-        val title = editTitle.text.toString().trim()
-        val description = editDescription.text.toString().trim()
-        val address = editAddress.text.toString().trim()
-        val startTime = selectedTimestamp
+    // ===== SAVE FLOW =====
 
-        if (title.isEmpty()) {
-            Toast.makeText(this, "Please enter a title", Toast.LENGTH_SHORT).show()
+    private fun saveEvent() {
+        val title = b.editEventTitle.text?.toString()?.trim().orEmpty()
+        val description = b.editEventDescription.text?.toString()?.trim().orEmpty()
+        val address = b.editEventAddress.text?.toString()?.trim().orEmpty()
+        val ts = selectedTimestamp
+
+        if (title.isBlank()) {
+            Toast.makeText(this, "Please enter an event title", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (address.isEmpty()) {
-            Toast.makeText(this, "Please enter an address/location", Toast.LENGTH_SHORT).show()
+        if (address.isBlank()) {
+            Toast.makeText(this, "Please enter an address / location", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (startTime == null) {
+        if (ts == null) {
             Toast.makeText(this, "Please pick a date and time", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
-        if (currentUserId == null) {
-            Toast.makeText(this, "You must be logged in to create an event", Toast.LENGTH_SHORT).show()
+        val user = auth.currentUser
+        if (user == null) {
+            Toast.makeText(this, "You must be logged in to create an event", Toast.LENGTH_SHORT)
+                .show()
             return
         }
 
-        val docRef = eventsRef.document()
+        b.buttonCreateEvent.isEnabled = false
 
-        // build event model
-        val event = RaceEvent(
-            id = docRef.id,
+        // Forward-geocode the address on a background thread
+        geocodeAndSaveEvent(
             title = title,
             description = description,
-            locationName = address,
-            startTime = startTime,
-            createdByUserId = currentUserId,
-            createdAt = Timestamp.now(),
-            interestedUserIds = emptyList()
+            address = address,
+            ownerUid = user.uid,
+            ownerName = user.displayName ?: user.email ?: "Unknown",
+            whenTs = ts
+        )
+    }
+
+    private fun geocodeAndSaveEvent(
+        title: String,
+        description: String,
+        address: String,
+        ownerUid: String,
+        ownerName: String,
+        whenTs: Timestamp
+    ) {
+        thread {
+            var lat: Double? = null
+            var lng: Double? = null
+
+            try {
+                val geocoder = Geocoder(this, Locale.getDefault())
+                val results = geocoder.getFromLocationName(address, 1)
+
+                if (!results.isNullOrEmpty()) {
+                    val loc = results[0]
+                    lat = loc.latitude
+                    lng = loc.longitude
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            runOnUiThread {
+                if (lat == null || lng == null) {
+                    Toast.makeText(
+                        this,
+                        "Could not resolve that address exactly. Saving event with text only.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                saveEventToFirestore(
+                    title = title,
+                    description = description,
+                    address = address,
+                    ownerUid = ownerUid,
+                    ownerName = ownerName,
+                    whenTs = whenTs,
+                    lat = lat,
+                    lng = lng
+                )
+            }
+        }
+    }
+
+    private fun saveEventToFirestore(
+        title: String,
+        description: String,
+        address: String,
+        ownerUid: String,
+        ownerName: String,
+        whenTs: Timestamp,
+        lat: Double?,
+        lng: Double?
+    ) {
+        val data = mutableMapOf<String, Any?>(
+            "title" to title,
+            "description" to description,
+            "addressText" to address,
+            "ownerUid" to ownerUid,
+            "ownerName" to ownerName,
+            "when" to whenTs,
+            "createdAt" to Timestamp.now()
         )
 
-        // save event
-        docRef.set(event)
+        if (lat != null && lng != null) {
+            data["latitude"] = lat
+            data["longitude"] = lng
+        }
+
+        db.collection("events")
+            .add(data)
             .addOnSuccessListener {
                 Toast.makeText(this, "Event created!", Toast.LENGTH_SHORT).show()
+                setResult(RESULT_OK)
                 finish()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                e.printStackTrace()
+                Toast.makeText(
+                    this,
+                    "Failed to create event: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+                b.buttonCreateEvent.isEnabled = true
             }
     }
 }

@@ -68,4 +68,8 @@ dependencies {
 
     // Graphs for Reports (from JitPack)
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0' // ← note the 'v'
+
+    // Geocoding
+    implementation "com.google.android.libraries.places:places:3.5.0"
+
 }
