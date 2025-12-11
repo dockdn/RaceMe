@@ -2,242 +2,173 @@ package com.example.raceme
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.location.Geocoder
 import android.os.Bundle
 import android.widget.Toast
 import com.example.raceme.databinding.ActivityCreateEventBinding
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Calendar
-import java.util.Locale
-import kotlin.concurrent.thread
 
 class CreateEventActivity : BaseActivity() {
 
     private lateinit var b: ActivityCreateEventBinding
-    private val db by lazy { FirebaseFirestore.getInstance() }
     private val auth by lazy { FirebaseAuth.getInstance() }
+    private val db by lazy { FirebaseFirestore.getInstance() }
 
-    // Holds the chosen event date/time
-    private val eventCal: Calendar = Calendar.getInstance()
-    private var selectedTimestamp: Timestamp? = null
+    private var pickedYear: Int? = null
+    private var pickedMonth: Int? = null   // 0-based
+    private var pickedDay: Int? = null
+    private var pickedHour: Int? = null
+    private var pickedMinute: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityCreateEventBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        // Back + cancel
+        // back + cancel
         b.btnBackCreateEvent.setOnClickListener { finish() }
         b.buttonCancel.setOnClickListener { finish() }
 
-        // Date & time buttons
+        // date picker
         b.buttonPickDate.setOnClickListener { showDatePicker() }
+
+        // time picker
         b.buttonPickTime.setOnClickListener { showTimePicker() }
 
-        // Create event button
-        b.buttonCreateEvent.setOnClickListener { saveEvent() }
+        // create event
+        b.buttonCreateEvent.setOnClickListener { createEvent() }
     }
 
-    // ===== DATE / TIME PICKERS =====
-
     private fun showDatePicker() {
-        val year = eventCal.get(Calendar.YEAR)
-        val month = eventCal.get(Calendar.MONTH)
-        val day = eventCal.get(Calendar.DAY_OF_MONTH)
+        val cal = Calendar.getInstance()
+        val y = pickedYear ?: cal.get(Calendar.YEAR)
+        val m = pickedMonth ?: cal.get(Calendar.MONTH)
+        val d = pickedDay ?: cal.get(Calendar.DAY_OF_MONTH)
 
-        DatePickerDialog(this, { _, y, m, d ->
-            eventCal.set(Calendar.YEAR, y)
-            eventCal.set(Calendar.MONTH, m)
-            eventCal.set(Calendar.DAY_OF_MONTH, d)
-            updateSelectedDateTimeLabel()
-        }, year, month, day).show()
+        DatePickerDialog(this, { _, year, month, dayOfMonth ->
+            pickedYear = year
+            pickedMonth = month
+            pickedDay = dayOfMonth
+            refreshSelectedDateTimeLabel()
+        }, y, m, d).show()
     }
 
     private fun showTimePicker() {
-        val hour = eventCal.get(Calendar.HOUR_OF_DAY)
-        val minute = eventCal.get(Calendar.MINUTE)
+        val cal = Calendar.getInstance()
+        val h = pickedHour ?: cal.get(Calendar.HOUR_OF_DAY)
+        val min = pickedMinute ?: cal.get(Calendar.MINUTE)
 
-        TimePickerDialog(this, { _, h, min ->
-            eventCal.set(Calendar.HOUR_OF_DAY, h)
-            eventCal.set(Calendar.MINUTE, min)
-            eventCal.set(Calendar.SECOND, 0)
-            eventCal.set(Calendar.MILLISECOND, 0)
-            updateSelectedDateTimeLabel()
-        }, hour, minute, false).show()
+        TimePickerDialog(this, { _, hourOfDay, minute ->
+            pickedHour = hourOfDay
+            pickedMinute = minute
+            refreshSelectedDateTimeLabel()
+        }, h, min, false).show()
     }
 
-    private fun updateSelectedDateTimeLabel() {
-        val fmt = java.text.SimpleDateFormat("EEE, MMM d • h:mm a", Locale.getDefault())
-        val label = fmt.format(eventCal.time)
-        b.textSelectedDateTime.text = label
-        selectedTimestamp = Timestamp(eventCal.time)
+    private fun refreshSelectedDateTimeLabel() {
+        val y = pickedYear
+        val m = pickedMonth
+        val d = pickedDay
+        val h = pickedHour
+        val min = pickedMinute
+
+        if (y != null && m != null && d != null && h != null && min != null) {
+            // display as MM/DD • h:mm a
+            val cal = Calendar.getInstance().apply {
+                set(y, m, d, h, min, 0)
+            }
+            val month = cal.get(Calendar.MONTH) + 1
+            val day = cal.get(Calendar.DAY_OF_MONTH)
+            val hour12 = ((cal.get(Calendar.HOUR) - 1 + 12) % 12) + 1
+            val ampm = if (cal.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
+            val minuteStr = String.format("%02d", cal.get(Calendar.MINUTE))
+
+            b.textSelectedDateTime.text = "$month/$day • $hour12:$minuteStr $ampm"
+        } else if (y != null && m != null && d != null) {
+            val month = m + 1
+            b.textSelectedDateTime.text = "$month/$d • time not set"
+        } else {
+            b.textSelectedDateTime.text = "No date/time selected"
+        }
     }
 
-    // ===== SAVE FLOW =====
+    private fun createEvent() {
+        val title = b.editEventTitle.text.toString().trim()
+        val description = b.editEventDescription.text.toString().trim()
 
-    private fun saveEvent() {
-        val title = b.editEventTitle.text?.toString()?.trim().orEmpty()
-        val description = b.editEventDescription.text?.toString()?.trim().orEmpty()
-
-        val street = b.editAddressStreet.text?.toString()?.trim().orEmpty()
-        val city = b.editAddressCity.text?.toString()?.trim().orEmpty()
-        val state = b.editAddressState.text?.toString()?.trim().orEmpty()
-        val zip = b.editAddressZip.text?.toString()?.trim().orEmpty()
-
-        val ts = selectedTimestamp
+        val street = b.editAddressStreet.text.toString().trim()
+        val city = b.editAddressCity.text.toString().trim()
+        val state = b.editAddressState.text.toString().trim()
+        val zip = b.editAddressZip.text.toString().trim()
 
         if (title.isBlank()) {
             Toast.makeText(this, "Please enter an event title", Toast.LENGTH_SHORT).show()
             return
         }
-        if (street.isBlank() || city.isBlank() || state.isBlank()) {
-            Toast.makeText(this, "Please enter a full address (street, city, state)", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (ts == null) {
+
+        // require date + time
+        val y = pickedYear
+        val m = pickedMonth
+        val d = pickedDay
+        val h = pickedHour
+        val min = pickedMinute
+        if (y == null || m == null || d == null || h == null || min == null) {
             Toast.makeText(this, "Please pick a date and time", Toast.LENGTH_SHORT).show()
             return
         }
 
+        val cal = Calendar.getInstance().apply {
+            set(y, m, d, h, min, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val startTime = Timestamp(cal.time)
+
+        val addressParts = listOf(street, city, state, zip).filter { it.isNotBlank() }
+        val locationName = if (addressParts.isNotEmpty()) {
+            addressParts.joinToString(", ")
+        } else {
+            null
+        }
+
         val user = auth.currentUser
         if (user == null) {
-            Toast.makeText(this, "You must be logged in to create an event", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(this, "You must be signed in to create an event", Toast.LENGTH_LONG).show()
             return
         }
 
-        // Build a nice full address string
-        val fullAddressParts = listOf(
-            street,
-            city,
-            if (state.isNotBlank()) state else null,
-            if (zip.isNotBlank()) zip else null
-        ).filterNotNull()
-
-        val fullAddress = fullAddressParts.joinToString(", ")
-
-        b.buttonCreateEvent.isEnabled = false
-
-        geocodeAndSaveEvent(
-            title = title,
-            description = description,
-            street = street,
-            city = city,
-            state = state,
-            zip = zip,
-            fullAddress = fullAddress,
-            ownerUid = user.uid,
-            ownerName = user.displayName ?: user.email ?: "Unknown",
-            whenTs = ts
-        )
-    }
-
-    private fun geocodeAndSaveEvent(
-        title: String,
-        description: String,
-        street: String,
-        city: String,
-        state: String,
-        zip: String,
-        fullAddress: String,
-        ownerUid: String,
-        ownerName: String,
-        whenTs: Timestamp
-    ) {
-        thread {
-            var lat: Double? = null
-            var lng: Double? = null
-
-            try {
-                val geocoder = Geocoder(this, Locale.getDefault())
-                val results = geocoder.getFromLocationName(fullAddress, 1)
-
-                if (!results.isNullOrEmpty()) {
-                    val loc = results[0]
-                    lat = loc.latitude
-                    lng = loc.longitude
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            runOnUiThread {
-                if (lat == null || lng == null) {
-                    Toast.makeText(
-                        this,
-                        "Could not resolve that address exactly. Saving event with text only.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                saveEventToFirestore(
-                    title = title,
-                    description = description,
-                    street = street,
-                    city = city,
-                    state = state,
-                    zip = zip,
-                    fullAddress = fullAddress,
-                    ownerUid = ownerUid,
-                    ownerName = ownerName,
-                    whenTs = whenTs,
-                    lat = lat,
-                    lng = lng
-                )
-            }
-        }
-    }
-
-    private fun saveEventToFirestore(
-        title: String,
-        description: String,
-        street: String,
-        city: String,
-        state: String,
-        zip: String,
-        fullAddress: String,
-        ownerUid: String,
-        ownerName: String,
-        whenTs: Timestamp,
-        lat: Double?,
-        lng: Double?
-    ) {
-        val data = mutableMapOf<String, Any?>(
+        val data = hashMapOf<String, Any?>(
             "title" to title,
             "description" to description,
+            "locationName" to locationName,
             "addressStreet" to street,
             "addressCity" to city,
             "addressState" to state,
             "addressZip" to zip,
-            "addressFull" to fullAddress,
-            "ownerUid" to ownerUid,
-            "ownerName" to ownerName,
-            "when" to whenTs,
-            "createdAt" to Timestamp.now()
+            "startTime" to startTime,
+            "ownerUid" to user.uid,
+            "ownerName" to (user.displayName ?: user.email ?: "Racer"),
+            "createdAt" to FieldValue.serverTimestamp(),
+            "interestedUserIds" to emptyList<String>()
         )
 
-        if (lat != null && lng != null) {
-            data["latitude"] = lat
-            data["longitude"] = lng
-        }
+        b.buttonCreateEvent.isEnabled = false
 
         db.collection("events")
             .add(data)
             .addOnSuccessListener {
                 Toast.makeText(this, "Event created!", Toast.LENGTH_SHORT).show()
-                setResult(RESULT_OK)
                 finish()
             }
             .addOnFailureListener { e ->
-                e.printStackTrace()
+                b.buttonCreateEvent.isEnabled = true
                 Toast.makeText(
                     this,
-                    "Failed to create event: ${e.message}",
+                    "Failed to create event: ${e.message ?: "Unknown error"}",
                     Toast.LENGTH_LONG
                 ).show()
-                b.buttonCreateEvent.isEnabled = true
             }
     }
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="#FFF7F8FA">
+    android:background="#FFF8F2">
 
     <!-- Header: back arrow + title -->
     <LinearLayout
@@ -58,7 +58,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Big steps text -->
         <TextView
             android:id="@+id/tvSteps"
             android:layout_width="match_parent"
@@ -70,7 +69,6 @@
             android:gravity="center_horizontal"
             android:paddingBottom="8dp" />
 
-        <!-- Goal text (small label under steps) -->
         <TextView
             android:id="@+id/tvStepGoal"
             android:layout_width="match_parent"
@@ -81,7 +79,6 @@
             android:gravity="center_horizontal"
             android:layout_marginTop="2dp" />
 
-        <!-- Progress % centered above bar -->
         <TextView
             android:id="@+id/tvProgressPercent"
             android:layout_width="match_parent"
@@ -92,7 +89,6 @@
             android:gravity="center"
             android:layout_marginTop="16dp" />
 
-        <!-- Horizontal progress bar -->
         <ProgressBar
             android:id="@+id/progressSteps"
             style="?android:attr/progressBarStyleHorizontal"
@@ -104,7 +100,7 @@
             android:layout_marginBottom="4dp" />
     </LinearLayout>
 
-    <!-- Goal input area at bottom -->
+    <!-- Goal input area -->
     <LinearLayout
         android:id="@+id/layoutGoalControls"
         android:layout_width="0dp"
@@ -150,7 +146,6 @@
             android:layout_height="wrap_content"
             android:text="Reset Steps"
             android:layout_marginTop="6dp" />
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

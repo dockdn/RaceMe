@@ -5,11 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class EventsAdapter(
     private val onEventClicked: (RaceEvent) -> Unit
@@ -41,37 +44,80 @@ class EventsAdapter(
         private val interestedCountText: TextView = itemView.findViewById(R.id.textInterestedCount)
         private val interestedButton: Button = itemView.findViewById(R.id.buttonInterested)
 
-        fun bind(event: RaceEvent) {
-            titleText.text = event.title
-            locationText.text = event.locationName
+        private val db = FirebaseFirestore.getInstance()
+        private val auth = FirebaseAuth.getInstance()
 
-            val dateStr = event.startTime?.toDate()?.toString() ?: "No date set"
+        fun bind(event: RaceEvent) {
+            titleText.text = event.title.ifBlank { "Untitled event" }
+
+            // Address/location
+            val loc = event.locationName
+            locationText.text = if (loc.isBlank()) "Location: not set" else loc
+
+            // Date/time formatting
+            val dateStr = event.startTime?.toDate()?.let { date ->
+                val fmt = SimpleDateFormat("EEE, MMM d • h:mm a", Locale.US)
+                fmt.format(date)
+            } ?: "No date set"
             dateText.text = dateStr
 
-            val interestedCount = event.interestedUserIds.size
-            interestedCountText.text = "$interestedCount person(s) interested"
+            // Interested count
+            var interestedList = event.interestedUserIds ?: emptyList()
+            var interestedCount = interestedList.size
 
-            val currentUid = FirebaseAuth.getInstance().currentUser?.uid
-            val isInterested = currentUid != null && event.interestedUserIds.contains(currentUid)
+            val currentUid = auth.currentUser?.uid
+            var isInterested = currentUid != null && interestedList.contains(currentUid)
 
-            // Change button text based on state
-            interestedButton.text = if (isInterested) "Not Interested" else "Interested"
+            updateInterestedUI(isInterested, interestedCount)
 
-            // Toggle when clicked
+            // Click to toggle interested
             interestedButton.setOnClickListener {
-                toggleInterested(event.id)
+                if (currentUid == null) {
+                    Toast.makeText(
+                        itemView.context,
+                        "You must be logged in to mark interest",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+
+                val eventId = event.id
+                if (eventId.isBlank()) {
+                    Toast.makeText(
+                        itemView.context,
+                        "Event ID missing; try again.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+
+                // Local optimistic update
+                if (isInterested) {
+                    isInterested = false
+                    interestedCount = (interestedCount - 1).coerceAtLeast(0)
+                } else {
+                    isInterested = true
+                    interestedCount += 1
+                }
+                updateInterestedUI(isInterested, interestedCount)
+
+                // Firestore transaction toggling array
+                toggleInterestedInFirestore(eventId, currentUid)
             }
 
-            // Click entire card
+            // Whole card click
             itemView.setOnClickListener {
                 onEventClicked(event)
             }
         }
 
-        private fun toggleInterested(eventId: String) {
-            val db = FirebaseFirestore.getInstance()
+        private fun updateInterestedUI(isInterested: Boolean, count: Int) {
+            interestedButton.text = if (isInterested) "Not interested" else "I'm interested"
+            interestedCountText.text = "$count person(s) interested"
+        }
+
+        private fun toggleInterestedInFirestore(eventId: String, uid: String) {
             val eventDoc = db.collection("events").document(eventId)
-            val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
             db.runTransaction { transaction ->
                 val snapshot = transaction.get(eventDoc)
@@ -84,6 +130,8 @@ class EventsAdapter(
                 }
 
                 transaction.update(eventDoc, "interestedUserIds", newList)
+            }.addOnFailureListener {
+                // We already did an optimistic UI update; Firestore listener will correct
             }
         }
     }

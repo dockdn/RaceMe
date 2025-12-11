@@ -3,17 +3,14 @@ package com.example.raceme
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.raceme.databinding.ActivityEventsBinding
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import java.util.Date
 
 class EventsActivity : BaseActivity() {
-
-    // view + firebase
 
     private lateinit var b: ActivityEventsBinding
     private val db = FirebaseFirestore.getInstance()
@@ -27,14 +24,12 @@ class EventsActivity : BaseActivity() {
 
     private lateinit var eventsAdapter: EventsAdapter
 
-    // lifecycle: onCreate
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityEventsBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        // header back button
+        // 🔙 Back button
         b.btnBackEvents.setOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -42,16 +37,18 @@ class EventsActivity : BaseActivity() {
             finish()
         }
 
-        // recycler + adapter
+        // Recycler + adapter
         eventsAdapter = EventsAdapter { event ->
+            // (Optional: tap behavior later)
         }
         b.recyclerEvents.layoutManager = LinearLayoutManager(this)
         b.recyclerEvents.adapter = eventsAdapter
 
-        // filter: default show all events
+        // Default = ALL events
         b.radioAll.isChecked = true
         startAllEventsListener()
 
+        // Toggle between ALL and MY
         b.radioGroupFilter.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.radioAll -> {
@@ -65,50 +62,71 @@ class EventsActivity : BaseActivity() {
             }
         }
 
-        // create event button
+        // Create new event
         b.btnCreateEvent.setOnClickListener {
             startActivity(Intent(this, CreateEventActivity::class.java))
         }
     }
 
-    // start listener: all upcoming events
-
+    // ==========================
+    //   LISTEN: ALL EVENTS
+    // ==========================
     private fun startAllEventsListener() {
         if (allEventsListener != null) return
 
         allEventsListener = eventsRef
-            .orderBy("startTime")
             .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) return@addSnapshotListener
+                if (error != null) {
+                    Toast.makeText(
+                        this,
+                        error.message ?: "Failed to load events",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    updateList(emptyList())
+                    return@addSnapshotListener
+                }
+
+                if (snapshot == null) {
+                    updateList(emptyList())
+                    return@addSnapshotListener
+                }
 
                 val rawList = snapshot.toObjects(RaceEvent::class.java)
-                val upcoming = filterUpcoming(rawList)
-
-                updateList(upcoming)
+                updateList(rawList)
             }
     }
 
-    // start listener: my upcoming events (where user is interested)
-
+    // ==========================
+    //   LISTEN: MY EVENTS ONLY
+    // ==========================
     private fun startMyEventsListener() {
         val uid = currentUserId ?: return
         if (myEventsListener != null) return
 
         myEventsListener = eventsRef
             .whereArrayContains("interestedUserIds", uid)
-            .orderBy("startTime")
             .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) return@addSnapshotListener
+                if (error != null) {
+                    Toast.makeText(
+                        this,
+                        error.message ?: "Failed to load my events",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    updateList(emptyList())
+                    return@addSnapshotListener
+                }
+
+                if (snapshot == null) {
+                    updateList(emptyList())
+                    return@addSnapshotListener
+                }
 
                 val rawList = snapshot.toObjects(RaceEvent::class.java)
-                val upcoming = filterUpcoming(rawList)
-
-                updateList(upcoming)
+                updateList(rawList)
             }
     }
 
-    // stop listeners
-
+    // Stop listeners
     private fun stopAllEventsListener() {
         allEventsListener?.remove()
         allEventsListener = null
@@ -119,27 +137,12 @@ class EventsActivity : BaseActivity() {
         myEventsListener = null
     }
 
-    // filter helper: only future events
-
-    private fun filterUpcoming(list: List<RaceEvent>): List<RaceEvent> {
-        val now = Date()
-        return list.filter { event ->
-            val ts = event.startTime
-            ts != null && ts.toDate().after(now)
-        }
-    }
-
-    // update UI with list + empty state
-
+    // Update list + empty label
     private fun updateList(events: List<RaceEvent>) {
         eventsAdapter.submitList(events)
-        if (events.isEmpty()) {
-            b.tvEventsEmpty.visibility = View.VISIBLE
-        } else {
-            b.tvEventsEmpty.visibility = View.GONE
-        }
+        b.tvEventsEmpty.visibility = if (events.isEmpty()) View.VISIBLE else View.GONE
     }
-    
+
     override fun onDestroy() {
         super.onDestroy()
         stopAllEventsListener()
