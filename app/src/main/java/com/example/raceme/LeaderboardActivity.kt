@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.raceme.databinding.ActivityLeaderboardBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.roundToInt
 
@@ -62,10 +63,7 @@ class LeaderboardActivity : BaseActivity() {
         loadLeaderboard()
     }
 
-    /**
-     * Load leaderboard based on the current user's "friends" array.
-     * For each UID (friends + me), we recompute lifetime miles/steps from runs.
-     */
+    // load leaderboard using current user's "friends" array
     private fun loadLeaderboard() {
         val currentUid = auth.currentUser?.uid
         if (currentUid == null) {
@@ -88,7 +86,6 @@ class LeaderboardActivity : BaseActivity() {
                     friendUids.add(currentUid)
                 }
 
-                // if somehow empty, just reset UI
                 if (friendUids.isEmpty()) {
                     b.tvLeaderboardTitle.text = "Friends Leaderboard"
                     b.progressBar.visibility = View.GONE
@@ -97,7 +94,52 @@ class LeaderboardActivity : BaseActivity() {
                     return@addOnSuccessListener
                 }
 
-                fetchAllUserRows(friendUids)
+                // Firestore whereIn max 10 items → chunk friend IDs
+                val chunks = friendUids.chunked(10)
+                val combined = mutableListOf<LeaderboardUserRow>()
+                var finishedChunks = 0
+
+                for (chunk in chunks) {
+                    db.collection("users")
+                        .whereIn(FieldPath.documentId(), chunk)
+                        .get()
+                        .addOnSuccessListener { snap ->
+                            val rows = snap.documents.map { d ->
+                                val uid = d.id
+                                val name =
+                                    d.getString("displayName")
+                                        ?: d.getString("email")
+                                        ?: uid.take(6)
+
+                                // BASELINE: use whatever is stored on the user doc right now
+                                val meters = d.getDouble("distanceMeters") ?: 0.0
+                                val miles = meters / 1609.344
+                                val steps = (d.getLong("steps") ?: 0L).toInt()
+
+                                LeaderboardUserRow(
+                                    uid = uid,
+                                    name = name,
+                                    steps = steps,
+                                    miles = miles
+                                )
+                            }
+                            combined.addAll(rows)
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(
+                                this,
+                                "Partial leaderboard error: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        .addOnCompleteListener {
+                            finishedChunks++
+                            if (finishedChunks == chunks.size) {
+                                // Once all user docs loaded, recompute any user who HAS runs
+                                recomputeAllFromRuns(combined)
+                            }
+                        }
+                }
             }
             .addOnFailureListener { e ->
                 b.tvLeaderboardTitle.text = "Friends Leaderboard"
@@ -110,93 +152,70 @@ class LeaderboardActivity : BaseActivity() {
             }
     }
 
-    /**
-     * For each UID, fetch:
-     *  - displayName/email (from users doc)
-     *  - ALL runs under users/{uid}/runs
-     * Then compute lifetime miles + steps from runs.
-     */
-    private fun fetchAllUserRows(uids: List<String>) {
-        val results = mutableListOf<LeaderboardUserRow>()
-        var completed = 0
-        val total = uids.size
-
-        fun doneOne() {
-            completed++
-            if (completed == total) {
-                // all users processed, update UI
-                allRows.clear()
-                allRows.addAll(results)
-                applySorting()
-
-                b.tvLeaderboardTitle.text = "Friends Leaderboard"
-                b.progressBar.visibility = View.GONE
-            }
+    // recompute lifetime miles + steps from runs for every user who has runs
+    private fun recomputeAllFromRuns(baseRows: List<LeaderboardUserRow>) {
+        if (baseRows.isEmpty()) {
+            allRows.clear()
+            adapter.submit(emptyList())
+            b.tvLeaderboardTitle.text = "Friends Leaderboard"
+            b.progressBar.visibility = View.GONE
+            return
         }
 
-        for (uid in uids) {
+        val mutableRows = baseRows.toMutableList()
+        var remaining = mutableRows.size
+
+        for (row in mutableRows) {
+            val uid = row.uid
             db.collection("users").document(uid)
+                .collection("runs")
                 .get()
-                .addOnSuccessListener { userDoc ->
-                    val name = userDoc.getString("displayName")
-                        ?: userDoc.getString("email")
-                        ?: uid.take(6)
+                .addOnSuccessListener { runsSnap ->
+                    // If no runs for this user → keep their existing steps/miles
+                    if (runsSnap.isEmpty) {
+                        return@addOnSuccessListener
+                    }
 
-                    // now get this user's runs
-                    db.collection("users").document(uid)
-                        .collection("runs")
-                        .get()
-                        .addOnSuccessListener { runsSnap ->
-                            var totalMeters = 0.0
+                    var totalMeters = 0.0
 
-                            for (d in runsSnap.documents) {
-                                val meters = d.getDouble("distanceMeters")
-                                val miles = d.getDouble("distanceMiles")
+                    for (d in runsSnap.documents) {
+                        val meters = d.getDouble("distanceMeters")
+                        val miles = d.getDouble("distanceMiles")
 
-                                totalMeters += when {
-                                    meters != null -> meters
-                                    miles != null -> miles * 1609.344
-                                    else -> 0.0
-                                }
-                            }
-
-                            val milesTotal = totalMeters / 1609.344
-                            val stepsApprox = (milesTotal * 1400.0).roundToInt()
-
-                            results.add(
-                                LeaderboardUserRow(
-                                    uid = uid,
-                                    name = name,
-                                    steps = stepsApprox,
-                                    miles = milesTotal
-                                )
-                            )
-                            doneOne()
+                        totalMeters += when {
+                            meters != null -> meters
+                            miles != null -> miles * 1609.344
+                            else -> 0.0
                         }
-                        .addOnFailureListener {
-                            // if runs query fails, still add row with 0s
-                            results.add(
-                                LeaderboardUserRow(
-                                    uid = uid,
-                                    name = name,
-                                    steps = 0,
-                                    miles = 0.0
-                                )
-                            )
-                            doneOne()
-                        }
+                    }
+
+                    val milesTotal = totalMeters / 1609.344
+                    // 🔢 use 1400 steps per mile now
+                    val stepsApprox = (milesTotal * 1400.0).roundToInt()
+
+                    val idx = mutableRows.indexOfFirst { it.uid == uid }
+                    if (idx != -1) {
+                        val old = mutableRows[idx]
+                        mutableRows[idx] = old.copy(
+                            steps = stepsApprox,
+                            miles = milesTotal
+                        )
+                    }
                 }
                 .addOnFailureListener {
-                    // total failure for this user → add minimal row
-                    results.add(
-                        LeaderboardUserRow(
-                            uid = uid,
-                            name = uid.take(6),
-                            steps = 0,
-                            miles = 0.0
-                        )
-                    )
-                    doneOne()
+                    // ignore, leave baseline values
+                }
+                .addOnCompleteListener {
+                    remaining--
+                    if (remaining == 0) {
+                        // All friends processed → update UI
+                        allRows.clear()
+                        allRows.addAll(mutableRows)
+                        applySorting()
+
+                        b.tvLeaderboardTitle.text = "Friends Leaderboard"
+                        b.progressBar.visibility = View.GONE
+                    }
                 }
         }
     }

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-// row model for leaderboard
+// row model for leaderboard (includes uid so we can recompute per user)
 data class LeaderboardUserRow(
     val uid: String,
     val name: String,
@@ -48,10 +48,10 @@ class LeaderboardAdapter(
         // racer name
         holder.tvName.text = item.name
 
-        // lifetime steps (approx)
+        // steps (approximate)
         holder.tvSteps.text = "Steps: ${item.steps}"
 
-        // lifetime miles
+        // miles total
         holder.tvDistance.text = String.format("Miles: %.2f", item.miles)
     }
 

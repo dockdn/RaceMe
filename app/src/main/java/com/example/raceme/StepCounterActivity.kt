@@ -1,65 +1,48 @@
 package com.example.raceme
 
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import com.example.raceme.databinding.ActivityStepCounterBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
-class StepCounterActivity : BaseActivity(), SensorEventListener {
+class StepCounterActivity : BaseActivity() {
 
     private lateinit var binding: ActivityStepCounterBinding
 
+    // Lifetime goal (local only) + lifetime steps (from Firestore)
     private var stepGoal: Int = 0
     private var stepsTaken: Int = 0
 
+    // Local prefs just for goal
     private val prefs by lazy { getSharedPreferences("step_prefs", MODE_PRIVATE) }
 
-    // Sensor-related fields
-    private lateinit var sensorManager: SensorManager
-    private var stepCounterSensor: Sensor? = null
-    private var baselineSteps: Int? = null   // used to turn device's lifetime steps into "today/session" steps
-    private var isSensorMode: Boolean = false
+    // Firebase
+    private val auth by lazy { FirebaseAuth.getInstance() }
+    private val db by lazy { FirebaseFirestore.getInstance() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityStepCounterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Load saved values
-        stepGoal = prefs.getInt("step_goal", 0)
-        stepsTaken = prefs.getInt("steps_taken", 0)
-
-        // Back arrow
+        // 🔙 Back arrow
         binding.root.findViewById<View>(R.id.btnBackSteps).setOnClickListener {
             finish()
         }
 
-        // Initialize sensor manager + step counter sensor
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-        isSensorMode = stepCounterSensor != null
+        // Load saved goal from prefs
+        stepGoal = prefs.getInt("step_goal", 0)
 
-        if (!isSensorMode) {
-            // Emulator / devices without sensor
-            Toast.makeText(
-                this,
-                "Step sensor not available – demo mode (tap steps to increment).",
-                Toast.LENGTH_SHORT
-            ).show()
-        } else {
-            // Real device with sensor
-            Toast.makeText(
-                this,
-                "Using device step sensor when on your phone.",
-                Toast.LENGTH_SHORT
-            ).show()
+        // Load lifetime steps from Firestore
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            Toast.makeText(this, "You must be logged in to view steps", Toast.LENGTH_SHORT).show()
+            finish()
+            return
         }
-
-        updateUI()
+        loadStepsFromFirestore(uid)
 
         // Set step goal button
         binding.btnSetGoal.setOnClickListener {
@@ -74,75 +57,36 @@ class StepCounterActivity : BaseActivity(), SensorEventListener {
             }
         }
 
-        // Reset steps button
+        // "Reset" – just clears the local view for this session
+        // (lifetime steps will reload from runs next time you open the screen)
         binding.btnReset.setOnClickListener {
             stepsTaken = 0
-            baselineSteps = null        // reset baseline so sensor session starts fresh
-            prefs.edit().putInt("steps_taken", stepsTaken).apply()
             updateUI()
+            Toast.makeText(this, "Progress cleared (lifetime steps stay in your runs)", Toast.LENGTH_SHORT).show()
         }
 
-        // Demo mode: tap steps to increment ONLY if no sensor
-        if (!isSensorMode) {
-            binding.tvSteps.setOnClickListener {
-                stepsTaken++
-                prefs.edit().putInt("steps_taken", stepsTaken).apply()
-                updateUI()
-            }
-        } else {
-            // On real device, sensor will control step count, no tap listener needed
-            binding.tvSteps.setOnClickListener(null)
-        }
-    }
-
-    // --- Lifecycle: register/unregister sensor listener ---
-
-    override fun onResume() {
-        super.onResume()
-        if (isSensorMode && stepCounterSensor != null) {
-            sensorManager.registerListener(
-                this,
-                stepCounterSensor,
-                SensorManager.SENSOR_DELAY_NORMAL
-            )
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        if (isSensorMode) {
-            sensorManager.unregisterListener(this)
-        }
-    }
-
-    // --- SensorEventListener implementation ---
-
-    override fun onSensorChanged(event: SensorEvent?) {
-        if (!isSensorMode) return
-        if (event?.sensor?.type != Sensor.TYPE_STEP_COUNTER) return
-
-        // This is the device's cumulative step count since last reboot
-        val deviceTotalSteps = event.values[0].toInt()
-
-        if (baselineSteps == null) {
-            // Calibrate baseline so we don't show lifetime steps,
-            // just "today / session" + whatever we may have already saved.
-            baselineSteps = deviceTotalSteps - stepsTaken
-        }
-
-        val base = baselineSteps ?: return
-        stepsTaken = (deviceTotalSteps - base).coerceAtLeast(0)
-
-        prefs.edit().putInt("steps_taken", stepsTaken).apply()
+        // Initial UI (will be updated again once Firestore comes back)
         updateUI()
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // no-op
+    /**
+     * Pull lifetime steps from Firestore user doc:
+     * users/{uid}.steps (updated when you save runs).
+     */
+    private fun loadStepsFromFirestore(uid: String) {
+        db.collection("users").document(uid)
+            .get()
+            .addOnSuccessListener { doc ->
+                stepsTaken = (doc.getLong("steps") ?: 0L).toInt()
+                updateUI()
+            }
+            .addOnFailureListener {
+                // If it fails, we just keep whatever we have (default 0)
+                updateUI()
+            }
     }
 
-    // --- UI update logic ---
-
+    // Update UI based on steps + goal
     private fun updateUI() {
         // Update steps text
         binding.tvSteps.text = "Steps Taken: $stepsTaken"
@@ -153,7 +97,9 @@ class StepCounterActivity : BaseActivity(), SensorEventListener {
 
         // Calculate and show progress
         val progressPercent = if (stepGoal > 0) {
-            ((stepsTaken.toFloat() / stepGoal.toFloat()) * 100).toInt().coerceIn(0, 100)
+            ((stepsTaken.toFloat() / stepGoal.toFloat()) * 100)
+                .toInt()
+                .coerceIn(0, 100)
         } else {
             0
         }
