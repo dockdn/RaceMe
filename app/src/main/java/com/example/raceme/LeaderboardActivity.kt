@@ -13,23 +13,24 @@ import kotlin.math.roundToInt
 class LeaderboardActivity : BaseActivity() {
 
     // view + firebase
-
     private lateinit var b: ActivityLeaderboardBinding
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }
 
     // data + adapter
-
     private val allRows = mutableListOf<LeaderboardUserRow>()
     private lateinit var adapter: LeaderboardAdapter
     private var sortByDistance = true   // distance first, steps when toggled
-
-    // lifecycle: onCreate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityLeaderboardBinding.inflate(layoutInflater)
         setContentView(b.root)
+
+        // 🔙 Back arrow
+        b.btnBackLeaderboard.setOnClickListener {
+            finish()
+        }
 
         // header labels
         b.tvLeaderboardTitle.text = "Friends Leaderboard"
@@ -63,7 +64,6 @@ class LeaderboardActivity : BaseActivity() {
     }
 
     // load leaderboard using current user's "friends" array
-
     private fun loadLeaderboard() {
         val currentUid = auth.currentUser?.uid
         if (currentUid == null) {
@@ -155,7 +155,6 @@ class LeaderboardActivity : BaseActivity() {
     }
 
     // recompute *my* lifetime miles + steps from runs (so they are accurate)
-
     private fun recomputeCurrentUserFromRuns(
         currentUid: String,
         baseRows: MutableList<LeaderboardUserRow>
@@ -210,7 +209,6 @@ class LeaderboardActivity : BaseActivity() {
     }
 
     // sort + update adapter based on current mode
-
     private fun applySorting() {
         if (allRows.isEmpty()) {
             adapter.submit(emptyList())

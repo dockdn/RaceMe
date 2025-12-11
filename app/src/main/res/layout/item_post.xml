@@ -51,7 +51,7 @@
                 android:textColor="#777777"
                 android:fontFamily="@font/vt323" />
 
-            <!-- NEW delete button (hidden by default; shown only for own posts) -->
+            <!-- delete button (hidden by default; shown only for own posts) -->
             <ImageView
                 android:id="@+id/btnDelete"
                 android:layout_width="22dp"
@@ -74,16 +74,17 @@
             android:textColor="#2D2D2D"
             android:fontFamily="@font/vt323" />
 
-        <!-- Photo (optional) -->
+        <!-- Photo (optional, full image, no cropping) -->
         <ImageView
             android:id="@+id/ivPhoto"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:scaleType="centerCrop"
             android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
             android:background="#FFF3EA"
-            android:contentDescription="Post photo" />
+            android:contentDescription="Post photo"
+            android:visibility="gone" />
 
         <!-- Like row -->
         <LinearLayout

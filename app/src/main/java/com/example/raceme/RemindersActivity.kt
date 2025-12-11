@@ -8,6 +8,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.text.format.DateFormat
+import android.view.View
 import android.widget.RadioButton
 import android.widget.TimePicker
 import android.widget.Toast
@@ -15,8 +17,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.example.raceme.databinding.ActivityRemindersBinding
 import java.util.Calendar
-import android.text.format.DateFormat
-
 
 class RemindersActivity : BaseActivity() {
     private lateinit var b: ActivityRemindersBinding
@@ -28,11 +28,16 @@ class RemindersActivity : BaseActivity() {
             }
         }
 
-    // activity setup
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityRemindersBinding.inflate(layoutInflater)
         setContentView(b.root)
+
+        // Back arrow
+        b.root.findViewById<View>(R.id.btnBackReminders).setOnClickListener {
+            finish()
+        }
+
         b.timePicker.setIs24HourView(DateFormat.is24HourFormat(this))
 
         ensureNotificationPermission()
@@ -46,7 +51,8 @@ class RemindersActivity : BaseActivity() {
         setTimePickerTime(b.timePicker, hour, min)
 
         b.btnSave.setOnClickListener {
-            val isDaily = (findViewById<RadioButton>(b.groupFrequency.checkedRadioButtonId) == b.rbDaily)
+            val isDaily =
+                (findViewById<RadioButton>(b.groupFrequency.checkedRadioButtonId) == b.rbDaily)
             val (h, m) = getTime(b.timePicker)
             saveReminder(isDaily, h, m)
         }
@@ -78,9 +84,11 @@ class RemindersActivity : BaseActivity() {
     // set TimePicker time
     private fun setTimePickerTime(tp: TimePicker, h: Int, m: Int) {
         if (Build.VERSION.SDK_INT >= 23) {
-            tp.hour = h; tp.minute = m
+            tp.hour = h
+            tp.minute = m
         } else {
-            tp.currentHour = h; tp.currentMinute = m
+            tp.currentHour = h
+            tp.currentMinute = m
         }
     }
 
@@ -137,6 +145,7 @@ class RemindersActivity : BaseActivity() {
             )
         }
     }
+
     // build PendingIntent for the reminder notification
     private fun buildPendingIntent(): PendingIntent {
         val intent = Intent(this, ReminderReceiver::class.java)

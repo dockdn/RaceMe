@@ -7,20 +7,40 @@
     android:padding="16dp"
     android:background="#FFF7F8FA">
 
-    <!-- Screen title -->
-    <TextView
-        android:id="@+id/tvTitle"
+    <!-- Header: back arrow + title -->
+    <LinearLayout
+        android:id="@+id/headerSteps"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Daily Step Tracker"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="#222222"
-        android:gravity="center"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="12dp"/>
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnBackSteps"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@android:color/transparent"
+            android:padding="4dp"
+            android:src="@drawable/ic_back_arrow"
+            android:contentDescription="Back" />
+
+        <!-- Screen title -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="12dp"
+            android:layout_weight="1"
+            android:text="Daily Step Tracker"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#222222"
+            android:gravity="center_horizontal" />
+    </LinearLayout>
 
     <!-- Card with main stats -->
     <LinearLayout
@@ -34,7 +54,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         android:layout_marginHorizontal="4dp"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintTop_toBottomOf="@id/headerSteps"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -85,7 +105,6 @@
     </LinearLayout>
 
     <!-- Goal input area at bottom -->
-
     <LinearLayout
         android:id="@+id/layoutGoalControls"
         android:layout_width="0dp"

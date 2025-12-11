@@ -2,7 +2,6 @@ package com.example.raceme
 
 import android.os.Bundle
 import android.widget.RadioButton
-import androidx.appcompat.app.AppCompatActivity
 import com.example.raceme.databinding.ActivityReportsBinding
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -15,8 +14,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import com.example.raceme.models.RunPoint
 
-
-class ReportsActivity : AppCompatActivity() {
+class ReportsActivity : BaseActivity() {   // ✅ now extends BaseActivity like others
     private lateinit var b: ActivityReportsBinding
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }
@@ -24,20 +22,25 @@ class ReportsActivity : AppCompatActivity() {
 
     private var allRuns: List<RunPoint> = emptyList()
 
-    // activity setup
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val user = auth.currentUser ?: run { finish(); return }
         b = ActivityReportsBinding.inflate(layoutInflater)
         setContentView(b.root)
 
+        // 🔙 back arrow
+        b.btnBackReports.setOnClickListener {
+            finish()
+        }
+
+        // chart styling
         setupChart(b.chartMiles)
         setupChart(b.chartTime)
 
+        // weekly / monthly toggle
         b.groupRange.setOnCheckedChangeListener { _, _ -> renderCharts() }
     }
 
-    // reload data each time user returns
     override fun onResume() {
         super.onResume()
         loadRunsThenRender()
@@ -67,13 +70,25 @@ class ReportsActivity : AppCompatActivity() {
             }
     }
 
-    // chart styling
+    // chart styling (muted brick red + more readable text)
     private fun setupChart(chart: com.github.mikephil.charting.charts.BarChart) {
+        val brickRed = 0xFFB64D4D.toInt()
+        val axisTextColor = 0xFF5A4A42.toInt()
+
         chart.description.isEnabled = false
         chart.axisRight.isEnabled = false
+
         chart.axisLeft.axisMinimum = 0f
+        chart.axisLeft.textColor = axisTextColor
+        chart.axisLeft.textSize = 11f
+        chart.axisLeft.gridColor = 0x33AAAAAA   // very light grid
+
         chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
         chart.xAxis.granularity = 1f
+        chart.xAxis.textColor = axisTextColor
+        chart.xAxis.textSize = 10f
+        chart.xAxis.axisLineColor = brickRed
+
         chart.legend.isEnabled = false
         chart.setScaleEnabled(false)
         chart.setPinchZoom(false)
@@ -157,13 +172,26 @@ class ReportsActivity : AppCompatActivity() {
         values: DoubleArray
     ) {
         val entries = values.mapIndexed { i, v -> BarEntry(i.toFloat(), v.toFloat()) }
-        val set = BarDataSet(entries, "").apply { valueTextSize = 10f }
-        chart.data = BarData(set).apply { barWidth = 0.6f }
-        chart.xAxis.valueFormatter = com.github.mikephil.charting.formatter.IndexAxisValueFormatter(labels)
+
+        val brickRed = 0xFFB64D4D.toInt()
+
+        val set = BarDataSet(entries, "").apply {
+            color = brickRed
+            valueTextSize = 11f
+            valueTextColor = 0xFF333333.toInt()
+        }
+
+        chart.data = BarData(set).apply {
+            barWidth = 0.6f
+        }
+
+        chart.xAxis.valueFormatter =
+            com.github.mikephil.charting.formatter.IndexAxisValueFormatter(labels)
         chart.xAxis.labelRotationAngle = -40f
         chart.invalidate()
 
-        b.tvEmpty.visibility = if (values.sum() == 0.0) android.view.View.VISIBLE else android.view.View.GONE
+        b.tvEmpty.visibility =
+            if (values.sum() == 0.0) android.view.View.VISIBLE else android.view.View.GONE
     }
 
     // update summary text at top of screen
