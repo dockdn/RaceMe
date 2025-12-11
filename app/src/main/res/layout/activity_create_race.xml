@@ -101,6 +101,34 @@
                     android:fontFamily="@font/vt323"
                     android:textSize="18sp" />
 
+                <!-- TYPE DROPDOWN -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Type of run"
+                    android:textSize="16sp"
+                    android:textColor="#6B2C2C"
+                    android:fontFamily="@font/vt323" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layoutType"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:hint="Select type"
+                    app:boxStrokeColor="#B64D4D"
+                    app:endIconMode="dropdown_menu">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/inputType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:fontFamily="@font/vt323"
+                        android:textSize="18sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <!-- distance label -->
                 <TextView
                     android:layout_width="wrap_content"
@@ -150,7 +178,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Starting location (address)"
+                    android:text="Starting location (optional)"
                     android:textSize="16sp"
                     android:textColor="#6B2C2C"
                     android:fontFamily="@font/vt323" />
@@ -163,7 +191,7 @@
                     android:layout_marginBottom="12dp"
                     android:background="@drawable/retro_bar_bg"
                     android:padding="12dp"
-                    android:hint="e.g. 100 Hofstra University, Hempstead, NY"
+                    android:hint="e.g. Hofstra University, Hempstead, NY"
                     android:fontFamily="@font/vt323"
                     android:textSize="18sp" />
 

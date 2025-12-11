@@ -1,55 +1,77 @@
 package com.example.raceme
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.raceme.databinding.ItemTrackBinding
-import kotlin.math.round
 
 class TracksAdapter(
     private val onClick: (Track) -> Unit
-) : RecyclerView.Adapter<TracksAdapter.VH>() {
+) : RecyclerView.Adapter<TracksAdapter.TrackViewHolder>() {
 
-    // The full list of all tracks
-    private val all = mutableListOf<Track>()
-    private val shown = mutableListOf<Track>()
+    private val allItems = mutableListOf<Track>()
+    private val visibleItems = mutableListOf<Track>()
 
-
-    class VH(val b: ItemTrackBinding) : RecyclerView.ViewHolder(b.root)
-
-    //Full list of items
-    fun setItems(items: List<Track>) {
-        all.clear(); all.addAll(items)
-        filter("")
-    }
-
-    //Trakcs by name using a  lowercase text match
-    fun filter(query: String) {
-        val q = query.trim().lowercase()
-        shown.clear()
-        if (q.isEmpty()) shown.addAll(all)
-        else shown.addAll(all.filter { it.name.lowercase().contains(q) })
+    fun setItems(list: List<Track>) {
+        allItems.clear()
+        allItems.addAll(list)
+        visibleItems.clear()
+        visibleItems.addAll(list)
         notifyDataSetChanged()
     }
 
-    // Inflate item view
-    override fun onCreateViewHolder(p: ViewGroup, v: Int): VH {
-        val b = ItemTrackBinding.inflate(LayoutInflater.from(p.context), p, false)
-        return VH(b)
+    fun filter(query: String) {
+        val q = query.trim().lowercase()
+        visibleItems.clear()
+        if (q.isEmpty()) {
+            visibleItems.addAll(allItems)
+        } else {
+            visibleItems.addAll(
+                allItems.filter { track ->
+                    track.name.lowercase().contains(q) ||
+                            track.type.lowercase().contains(q) ||
+                            (track.addressText ?: "").lowercase().contains(q)
+                }
+            )
+        }
+        notifyDataSetChanged()
     }
 
-    override fun getItemCount() = shown.size
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_track_browse, parent, false)
+        return TrackViewHolder(view)
+    }
 
+    override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
+        val track = visibleItems[position]
+        holder.bind(track, onClick)
+    }
 
-    override fun onBindViewHolder(h: VH, i: Int) {
-        val t = shown[i]
+    override fun getItemCount(): Int = visibleItems.size
 
-        // Set track name with fallback text for blank names
-        h.b.tvName.text = t.name.ifBlank { "Untitled Track" }
+    class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val tvName: TextView = itemView.findViewById(R.id.tvTrackName)
+        private val tvType: TextView = itemView.findViewById(R.id.tvTrackType)
+        private val tvAddress: TextView = itemView.findViewById(R.id.tvTrackAddress)
 
-        val miles = round(t.distanceMiles * 100.0) / 100.0
-        h.b.tvMeta.text = "${miles} mi"
+        fun bind(track: Track, onClick: (Track) -> Unit) {
+            tvName.text = track.name
 
-        h.b.root.setOnClickListener { onClick(t) }
+            val typeDisplay = if (track.type.isNotBlank()) track.type else "Open run"
+            val distanceDisplay =
+                if (track.distanceMiles > 0.0) String.format("%.2f mi", track.distanceMiles) else ""
+
+            tvType.text = if (distanceDisplay.isNotEmpty()) {
+                "$typeDisplay • $distanceDisplay"
+            } else {
+                typeDisplay
+            }
+
+            tvAddress.text = track.addressText ?: "Location: not specified"
+
+            itemView.setOnClickListener { onClick(track) }
+        }
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -9,127 +10,151 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Stats -->
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Run summary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#B64D4D" />
+
+        <!-- Distance & pace -->
         <TextView
             android:id="@+id/tvDistance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="Distance: 0.00 mi"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#2D2D2D"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textSize="16sp"
+            android:textColor="#6B2C2C" />
 
         <TextView
             android:id="@+id/tvPace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="Pace: --:-- / mi"
             android:textSize="16sp"
-            android:textColor="#555555"
-            android:layout_marginTop="4dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textColor="#6B2C2C" />
 
-        <!-- Quote -->
+        <!-- Motivational quote -->
         <TextView
             android:id="@+id/tvQuote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="“Keep going!”"
             android:textSize="14sp"
-            android:textColor="#777777"
-            android:layout_marginTop="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textColor="#9C7F6A" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginVertical="12dp"
-            android:background="#EFEFEF" />
-
-        <!-- ⭐ Rating -->
+        <!-- Rating -->
         <TextView
-            android:text="How was it?"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#2D2D2D"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Rate this run"
+            android:textSize="14sp"
+            android:textColor="#6B2C2C" />
 
         <RatingBar
             android:id="@+id/ratingBar"
-            style="?android:attr/ratingBarStyle"
-            android:numStars="5"
-            android:stepSize="1"
-            android:isIndicator="false"
-            android:clickable="true"
-            android:focusable="true"
-            android:layout_marginTop="6dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1.0" />
 
-        <!-- Shown only when creating a NEW track (we toggle this group visibility in code) -->
+        <!-- New track section -->
         <LinearLayout
             android:id="@+id/groupNewTrack"
             android:orientation="vertical"
-            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="visible">
+            android:layout_marginTop="16dp">
 
             <TextView
-                android:text="Track details"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#2D2D2D"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Save this as a track?"
+                android:textSize="16sp"
+                android:textColor="#B64D4D" />
 
-            <EditText
-                android:id="@+id/inputTrackName"
-                android:hint="Track name (required for new track)"
-                android:layout_marginTop="8dp"
-                android:padding="12dp"
-                android:background="@android:drawable/edit_text"
+            <!-- Track name -->
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Track name"
+                app:boxBackgroundMode="outline">
 
-            <EditText
-                android:id="@+id/inputTrackDesc"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputTrackName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Description -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:hint="Description (optional)"
-                android:layout_marginTop="8dp"
-                android:minLines="2"
-                android:padding="12dp"
-                android:background="@android:drawable/edit_text"
+                app:boxBackgroundMode="outline">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputTrackDesc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minLines="2"
+                    android:maxLines="4"
+                    android:gravity="top"
+                    android:inputType="textMultiLine" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Type dropdown -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutTrackType"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <!-- 🔥 NEW: Starting location / address for the track -->
-            <EditText
-                android:id="@+id/inputTrackLocation"
-                android:hint="Starting location (address, optional)"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:padding="12dp"
-                android:background="@android:drawable/edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:hint="Type of run"
+                app:boxBackgroundMode="outline"
+                app:endIconMode="dropdown_menu">
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
+                <AutoCompleteTextView
+                    android:id="@+id/ddTrackType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:cursorVisible="false" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Address (manual, optional) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:hint="Starting location (optional)"
+                app:boxBackgroundMode="outline">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputTrackAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Public switch (we'll ignore behavior for now) -->
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchMakePublic"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:text="Make this track public"
-                    android:textColor="#2D2D2D"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switchMakePublic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:checked="true"
+                android:text="Publish this track publicly" />
         </LinearLayout>
 
         <!-- Buttons -->
@@ -140,25 +165,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancel"
-                android:text="Cancel"
-                android:textAllCaps="true"
-                android:padding="12dp"
-                android:textColor="#8B3E3E"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Discard"
+                android:textAllCaps="false" />
 
-            <TextView
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
-                android:text="Save"
-                android:textAllCaps="true"
-                android:padding="12dp"
-                android:textColor="#FFFFFF"
-                android:background="#B64D4D"
-                android:layout_marginStart="12dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Save run"
+                android:textAllCaps="false"
+                android:layout_marginStart="8dp"
+                app:backgroundTint="#B64D4D"
+                android:textColor="@android:color/white" />
         </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

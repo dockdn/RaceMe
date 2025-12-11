@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    app:cardCornerRadius="16dp"
+    app:strokeColor="#F3D9C7"
+    app:strokeWidth="1dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:backgroundTint="#FFFFFF">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Track name -->
+        <TextView
+            android:id="@+id/tvTrackName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Downtown 10K"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#B64D4D"
+            android:fontFamily="@font/vt323" />
+
+        <!-- Type + distance -->
+        <TextView
+            android:id="@+id/tvTrackType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="10K • 6.20 mi"
+            android:textSize="16sp"
+            android:textColor="#6B2C2C"
+            android:fontFamily="@font/vt323" />
+
+        <!-- Address -->
+        <TextView
+            android:id="@+id/tvTrackAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Hempstead, NY"
+            android:textSize="14sp"
+            android:textColor="#9C7F6A"
+            android:fontFamily="@font/vt323" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

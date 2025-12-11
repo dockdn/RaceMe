@@ -10,6 +10,7 @@ import android.os.Looper
 import android.os.SystemClock
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
@@ -18,6 +19,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.example.raceme.databinding.ActivityStartRunBinding
 import com.google.android.gms.location.*
+import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -28,33 +31,34 @@ import kotlin.math.roundToInt
 
 class StartRunActivity : BaseActivity() {
 
-    // view + UI state
     private lateinit var b: ActivityStartRunBinding
+
+    // Timer / run state
     private var isPaused = true
     private var pauseOffset: Long = 0L
     private var startedAtMillis: Long? = null
 
-    // firebase
+    // Firebase
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }
 
-    // selected track
+    // Track selection
     private var selectedPublicRaceId: String? = null
     private var selectedTrackName: String? = null
     private var selectedType: String? = null
 
-    // gps tracking
+    // GPS tracking
     private lateinit var fused: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private var locationCallback: LocationCallback? = null
     private var lastFix: Location? = null
     private var distanceMeters: Double = 0.0
 
-    // timer
+    // Timer loop
     private val timerHandler = Handler(Looper.getMainLooper())
     private var timerRunnable: Runnable? = null
 
-    // permissions
+    // Permissions
     private val locationPermLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grants ->
             val fine = grants[Manifest.permission.ACCESS_FINE_LOCATION] == true
@@ -66,7 +70,7 @@ class StartRunActivity : BaseActivity() {
             }
         }
 
-    // track picker for public tracks
+    // Choose existing public track
     private val pickTrack =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { res ->
             if (res.resultCode == RESULT_OK) {
@@ -82,13 +86,12 @@ class StartRunActivity : BaseActivity() {
             }
         }
 
-    // lifecycle: onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityStartRunBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        // setup GPS client
+        // GPS setup
         fused = LocationServices.getFusedLocationProviderClient(this)
         locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1500L)
             .setMinUpdateIntervalMillis(1000L)
@@ -96,7 +99,7 @@ class StartRunActivity : BaseActivity() {
             .setMinUpdateDistanceMeters(2f)
             .build()
 
-        // dropdown for tracks
+        // Track dropdown: new vs browse
         val options = listOf("Start a new track", "Browse public tracks…")
         b.ddTrack.setAdapter(ArrayAdapter(this, android.R.layout.simple_list_item_1, options))
         b.ddTrack.setOnItemClickListener { _, _, position, _ ->
@@ -113,13 +116,13 @@ class StartRunActivity : BaseActivity() {
         b.ddTrack.setText("", false)
         selectedTrackName = null
 
-        // initialize run UI
+        // Initial UI
         b.tvMiles.text = "0.00 mi"
         b.btnPause.text = "Start"
         b.chronometer.base = SystemClock.elapsedRealtime()
         b.chronometer.text = formatElapsedTime(0L)
 
-        // start / pause button
+        // Start / Pause
         b.btnPause.setOnClickListener {
             if (isPaused && startedAtMillis == null) {
                 startRun()
@@ -128,18 +131,18 @@ class StartRunActivity : BaseActivity() {
             }
         }
 
-        // stop button
+        // Stop -> summary dialog
         b.btnStop.setOnClickListener {
             stopRunShowSummary()
         }
 
-        // back arrow wiring (if you added it in XML with id btnBack)
+        // Back button in toolbar (if present)
         b.root.findViewById<View?>(R.id.btnBack)?.setOnClickListener {
             finish()
         }
     }
 
-    // === TIMER HELPERS ===
+    // ========= TIMER HELPERS =========
 
     private fun formatElapsedTime(elapsedMs: Long): String {
         val totalSeconds = elapsedMs / 1000
@@ -166,7 +169,7 @@ class StartRunActivity : BaseActivity() {
         timerRunnable = null
     }
 
-    // === RUN LOGIC ===
+    // ========= RUN START / PAUSE =========
 
     private fun onStartPauseClicked() {
         if (isPaused) {
@@ -211,8 +214,7 @@ class StartRunActivity : BaseActivity() {
     }
 
     private fun ensureLocationPermissionThenStart() {
-        val fine =
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        val fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
         val coarse =
             ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
         if (fine == PackageManager.PERMISSION_GRANTED || coarse == PackageManager.PERMISSION_GRANTED) {
@@ -227,7 +229,7 @@ class StartRunActivity : BaseActivity() {
         }
     }
 
-    // === GPS TRACKING ===
+    // ========= GPS TRACKING =========
 
     private fun startLocationUpdates() {
         if (locationCallback != null) return
@@ -262,7 +264,7 @@ class StartRunActivity : BaseActivity() {
         b.tvMiles.text = String.format("%.2f mi", shown)
     }
 
-    // === STOP / SUMMARY / SAVE ===
+    // ========= STOP + SUMMARY =========
 
     private fun stopRunShowSummary() {
         val endMs = System.currentTimeMillis()
@@ -288,18 +290,36 @@ class StartRunActivity : BaseActivity() {
         ratingBar?.setIsIndicator(false)
 
         val groupNewTrack = view.findViewById<View>(R.id.groupNewTrack)
-        val inputName = view.findViewById<android.widget.EditText>(R.id.inputTrackName)
-        val inputDesc = view.findViewById<android.widget.EditText>(R.id.inputTrackDesc)
-        val switchMakePublic =
-            view.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchMakePublic)
+        val inputName = view.findViewById<TextInputEditText>(R.id.inputTrackName)
+        val inputDesc = view.findViewById<TextInputEditText>(R.id.inputTrackDesc)
+        val ddTrackType = view.findViewById<AutoCompleteTextView>(R.id.ddTrackType)
+        val inputAddress = view.findViewById<TextInputEditText>(R.id.inputTrackAddress)
+        val switchMakePublic = view.findViewById<SwitchMaterial>(R.id.switchMakePublic)
 
         val usingPublicTrack = (selectedPublicRaceId != null)
+
         if (usingPublicTrack) {
             groupNewTrack.visibility = View.GONE
         } else {
             groupNewTrack.visibility = View.VISIBLE
+
             if (!selectedTrackName.isNullOrBlank() && selectedTrackName != "New Track") {
                 inputName.setText(selectedTrackName)
+            }
+
+            val raceTypes = listOf("Open run", "5K", "10K", "Half Marathon", "Marathon")
+            val typeAdapter = ArrayAdapter(
+                this,
+                android.R.layout.simple_list_item_1,
+                raceTypes
+            )
+            ddTrackType.setAdapter(typeAdapter)
+
+            val initialType = selectedType?.takeIf { it.isNotBlank() } ?: "Open run"
+            ddTrackType.setText(initialType, false)
+
+            ddTrackType.setOnClickListener {
+                ddTrackType.showDropDown()
             }
         }
 
@@ -317,99 +337,95 @@ class StartRunActivity : BaseActivity() {
             val rating = (ratingBar?.rating ?: 0f).roundToInt()
 
             if (usingPublicTrack) {
-                saveRunToFirestore(startMs, endMs, elapsedMs, miles, pace, quote, rating)
+                // Existing public track: just save the run
+                saveRunToFirestore(
+                    startMs, endMs, elapsedMs, miles, pace, quote, rating,
+                    addressText = null
+                )
                 dlg.dismiss()
+                resetRunUI()
             } else {
                 val finalName = inputName.text?.toString()?.trim().orEmpty()
                 val desc = inputDesc.text?.toString()?.trim().orEmpty()
+
                 if (finalName.isEmpty()) {
                     Toast.makeText(this, "Enter a Track Name", Toast.LENGTH_LONG).show()
                     return@setOnClickListener
                 }
 
+                val typeText = ddTrackType.text?.toString()?.trim().orEmpty()
+                val finalType = if (typeText.isBlank()) "Open run" else typeText
+                selectedType = finalType
+
+                val addressTextRaw = inputAddress.text?.toString()?.trim()
+                val addressToSave = addressTextRaw?.takeIf { it.isNotBlank() }
+
                 selectedTrackName = finalName
 
+                // If "Make public" is on, create a public track document (doesn't block UI)
                 if (switchMakePublic.isChecked) {
-                    publishNewTrackThenSave(finalName, desc) {
-                        saveRunToFirestore(
-                            startMs,
-                            endMs,
-                            elapsedMs,
-                            miles,
-                            pace,
-                            quote,
-                            rating
-                        )
-                        dlg.dismiss()
-                    }
-                } else {
-                    savePrivateTrackIfNeeded(finalName, desc) {
-                        saveRunToFirestore(
-                            startMs,
-                            endMs,
-                            elapsedMs,
-                            miles,
-                            pace,
-                            quote,
-                            rating
-                        )
-                        dlg.dismiss()
-                    }
+                    createPublicTrackDoc(
+                        name = finalName,
+                        desc = desc,
+                        type = finalType,
+                        address = addressToSave
+                    )
                 }
+
+                // Always save the run exactly once
+                saveRunToFirestore(
+                    startMs, endMs, elapsedMs, miles, pace, quote, rating,
+                    addressText = addressToSave
+                )
+
+                dlg.dismiss()
+                resetRunUI()
             }
         }
 
         dlg.show()
     }
 
-    // publish new track
-    private fun publishNewTrackThenSave(
+    // ========= CREATE PUBLIC TRACK DOC =========
+
+    private fun createPublicTrackDoc(
         name: String,
         desc: String,
-        onDone: () -> Unit
+        type: String,
+        address: String?
     ) {
-        val u = auth.currentUser ?: return onDone()
+        val u = auth.currentUser ?: return
+
         val data = hashMapOf(
             "name" to name,
             "description" to desc,
-            "type" to (selectedType ?: ""),
+            "type" to type,
             "ownerUid" to u.uid,
             "ownerName" to (u.displayName ?: u.email ?: "Racer"),
             "visibility" to "public",
             "createdAt" to FieldValue.serverTimestamp()
-        )
+        ).apply {
+            if (!address.isNullOrBlank()) {
+                put("addressText", address)
+            }
+        }
+
         db.collection("publicRaces")
             .add(data)
-            .addOnSuccessListener { ref ->
-                selectedPublicRaceId = ref.id
-                onDone()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Track published!", Toast.LENGTH_SHORT).show()
             }
-            .addOnFailureListener {
-                onDone()
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    this,
+                    e.message ?: "Failed to publish track",
+                    Toast.LENGTH_LONG
+                ).show()
             }
     }
 
-    // save private track
-    private fun savePrivateTrackIfNeeded(
-        name: String,
-        desc: String,
-        onDone: () -> Unit
-    ) {
-        val u = auth.currentUser ?: return onDone()
-        val track = hashMapOf(
-            "name" to name,
-            "description" to desc,
-            "type" to (selectedType ?: ""),
-            "createdAt" to FieldValue.serverTimestamp()
-        )
-        db.collection("users").document(u.uid)
-            .collection("myTracks")
-            .add(track)
-            .addOnSuccessListener { onDone() }
-            .addOnFailureListener { onDone() }
-    }
+    // ========= SAVE RUN =========
 
-    // save run + leaderboard aggregates
     private fun saveRunToFirestore(
         startMs: Long,
         endMs: Long,
@@ -417,7 +433,8 @@ class StartRunActivity : BaseActivity() {
         miles: Double,
         pace: String,
         quote: String,
-        rating: Int
+        rating: Int,
+        addressText: String?
     ) {
         val u = auth.currentUser ?: return
 
@@ -430,6 +447,7 @@ class StartRunActivity : BaseActivity() {
         val runDoc = hashMapOf(
             "name" to friendlyName,
             "type" to (selectedType ?: ""),
+            "description" to "",
             "elapsedMs" to elapsedMs,
             "distanceMeters" to distanceMeters,
             "distanceMiles" to miles,
@@ -443,6 +461,9 @@ class StartRunActivity : BaseActivity() {
             "sdkInt" to android.os.Build.VERSION.SDK_INT
         ).apply {
             selectedPublicRaceId?.let { put("publicRaceId", it) }
+            if (!addressText.isNullOrBlank()) {
+                put("addressText", addressText)
+            }
         }
 
         db.collection("users").document(u.uid)
@@ -464,8 +485,6 @@ class StartRunActivity : BaseActivity() {
                     "Saved – ${String.format("%.2f", miles)} mi @ $pace",
                     Toast.LENGTH_LONG
                 ).show()
-
-                resetRunUI()
             }
             .addOnFailureListener { e ->
                 Toast.makeText(
@@ -475,6 +494,8 @@ class StartRunActivity : BaseActivity() {
                 ).show()
             }
     }
+
+    // ========= OTHER HELPERS =========
 
     private fun computePace(elapsedMs: Long, miles: Double): String {
         if (miles <= 0.0) return "--:-- / mi"
@@ -502,13 +523,18 @@ class StartRunActivity : BaseActivity() {
         startedAtMillis = null
         lastFix = null
         distanceMeters = 0.0
+
         b.btnPause.text = "Start"
         b.chronometer.base = SystemClock.elapsedRealtime()
         b.chronometer.text = formatElapsedTime(0L)
         b.tvMiles.text = "0.00 mi"
+
+        selectedPublicRaceId = null
+        selectedTrackName = null
+        selectedType = null
+        b.ddTrack.setText("", false)
     }
 
-    // lifecycle helpers
     override fun onPause() {
         super.onPause()
         if (!isPaused) {

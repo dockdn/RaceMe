@@ -1,45 +1,59 @@
 package com.example.raceme
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.raceme.databinding.ItemTrackBinding
-import kotlin.math.round
 
+/**
+ * Adapter for picking a public track (uses item_track.xml).
+ */
 class TrackPickAdapter(
     private val onClick: (Track) -> Unit
-) : RecyclerView.Adapter<TrackPickAdapter.VH>() {
+) : RecyclerView.Adapter<TrackPickAdapter.TrackViewHolder>() {
 
-    private val all = mutableListOf<Track>()
-    private val shown = mutableListOf<Track>()
+    private val items = mutableListOf<Track>()
 
-    class VH(val b: ItemTrackBinding) : RecyclerView.ViewHolder(b.root)
-
-    fun setItems(items: List<Track>) {
-        all.clear(); all.addAll(items)
-        filter("")
-    }
-
-    fun filter(query: String) {
-        val q = query.trim().lowercase()
-        shown.clear()
-        if (q.isEmpty()) shown.addAll(all)
-        else shown.addAll(all.filter { it.name.lowercase().contains(q) })
+    fun setItems(list: List<Track>) {
+        items.clear()
+        items.addAll(list)
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(p: ViewGroup, v: Int): VH {
-        val b = ItemTrackBinding.inflate(LayoutInflater.from(p.context), p, false)
-        return VH(b)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_track, parent, false)
+        return TrackViewHolder(view)
     }
 
-    override fun getItemCount() = shown.size
+    override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
+        val track = items[position]
+        holder.bind(track, onClick)
+    }
 
-    override fun onBindViewHolder(h: VH, i: Int) {
-        val t = shown[i]
-        h.b.tvName.text = t.name.ifBlank { "Untitled Track" }
-        val miles = round(t.distanceMiles * 100.0) / 100.0
-        h.b.tvMeta.text = "${miles} mi • Public"
-        h.b.root.setOnClickListener { onClick(t) }
+    override fun getItemCount(): Int = items.size
+
+    class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val tvName: TextView = itemView.findViewById(R.id.tvName)
+        private val tvType: TextView = itemView.findViewById(R.id.tvType)
+        private val tvDistance: TextView = itemView.findViewById(R.id.tvDistance)
+        private val tvAddress: TextView = itemView.findViewById(R.id.tvAddress)
+
+        fun bind(track: Track, onClick: (Track) -> Unit) {
+            tvName.text = track.name
+
+            val typeDisplay = if (track.type.isNotBlank()) track.type else "Open run"
+            tvType.text = "Type: $typeDisplay"
+
+            val distanceDisplay =
+                if (track.distanceMiles > 0.0) String.format("%.2f mi", track.distanceMiles)
+                else ""
+            tvDistance.text = distanceDisplay
+
+            tvAddress.text = track.addressText ?: "Location: not specified"
+
+            itemView.setOnClickListener { onClick(track) }
+        }
     }
 }

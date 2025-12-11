@@ -1,17 +1,10 @@
 package com.example.raceme
 
-import android.app.Activity
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.example.raceme.databinding.ActivityCreateRaceBinding
-import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.widget.Autocomplete
-import com.google.android.libraries.places.widget.AutocompleteActivity
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -24,127 +17,49 @@ class CreateRaceActivity : BaseActivity() {
     private val db by lazy { FirebaseFirestore.getInstance() }
     private val auth by lazy { FirebaseAuth.getInstance() }
 
-    // From Google Places autocomplete (if user chooses a place)
-    private var selectedLat: Double? = null
-    private var selectedLng: Double? = null
-    private var selectedLocationName: String? = null
+    private val raceTypes = listOf(
+        "5K",
+        "10K",
+        "Half Marathon",
+        "Marathon",
+        "Open run"
+    )
 
-    companion object {
-        private const val AUTOCOMPLETE_REQUEST_CODE_RACE = 1001
-    }
+    private var selectedType: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityCreateRaceBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        initPlacesIfNeeded()
-
-        // Back button
         b.btnBackCreateRace.setOnClickListener { finish() }
-
-        // Cancel button
         b.btnCancel.setOnClickListener { finish() }
 
-        // 🔥 Location field: open Google Places autocomplete, don't type manually
-        b.inputLocation.apply {
-            isFocusable = false
-            isClickable = true
-            setOnClickListener {
-                launchPlaceAutocompleteForRace()
-            }
-        }
+        setupTypeDropdown()
 
-        // Save button
         b.btnSave.setOnClickListener {
-            saveRace()
+            saveTrack()
         }
     }
 
-    // Initialize Places using API key from manifest
-    private fun initPlacesIfNeeded() {
-        if (!Places.isInitialized()) {
-            try {
-                val ai = applicationContext.packageManager
-                    .getApplicationInfo(packageName, PackageManager.GET_META_DATA)
-                val apiKey = ai.metaData.getString("com.google.android.geo.API_KEY")
-
-                if (!apiKey.isNullOrBlank()) {
-                    Places.initialize(applicationContext, apiKey, Locale.getDefault())
-                } else {
-                    Toast.makeText(
-                        this,
-                        "Places API key not found in manifest.",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(
-                    this,
-                    "Failed to initialize Places: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
-    }
-
-    // Launch the Google Places autocomplete overlay
-    private fun launchPlaceAutocompleteForRace() {
-        val fields = listOf(
-            Place.Field.NAME,
-            Place.Field.ADDRESS,
-            Place.Field.LAT_LNG
+    private fun setupTypeDropdown() {
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_list_item_1,
+            raceTypes
         )
+        b.inputType.setAdapter(adapter)
 
-        val intent = Autocomplete.IntentBuilder(
-            AutocompleteActivityMode.OVERLAY,
-            fields
-        ).build(this)
-
-        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE_RACE)
-    }
-
-    // Handle result from Places autocomplete UI
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == AUTOCOMPLETE_REQUEST_CODE_RACE) {
-            when (resultCode) {
-                Activity.RESULT_OK -> {
-                    val place = Autocomplete.getPlaceFromIntent(data!!)
-                    val latLng = place.latLng
-
-                    selectedLat = latLng?.latitude
-                    selectedLng = latLng?.longitude
-                    selectedLocationName = place.address ?: place.name
-
-                    // Show the chosen real address in the text field
-                    b.inputLocation.setText(selectedLocationName ?: "")
-                }
-
-                AutocompleteActivity.RESULT_ERROR -> {
-                    val status = Autocomplete.getStatusFromIntent(data!!)
-                    Toast.makeText(
-                        this,
-                        "Places error: ${status.statusMessage}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                Activity.RESULT_CANCELED -> {
-                    // user backed out, ignore
-                }
-            }
+        b.inputType.setOnItemClickListener { _, _, position, _ ->
+            selectedType = raceTypes[position]
         }
     }
 
-    // Validate input and start save flow
-    private fun saveRace() {
-        val name = b.inputName.text.toString().trim()
-        val description = b.inputDescription.text.toString().trim()
-        val distanceText = b.inputDistanceMiles.text.toString().trim()
-        val uiLocationText = b.inputLocation.text.toString().trim()
+    private fun saveTrack() {
+        val name = b.inputName.text?.toString()?.trim().orEmpty()
+        val description = b.inputDescription.text?.toString()?.trim().orEmpty()
+        val distanceText = b.inputDistanceMiles.text?.toString()?.trim().orEmpty()
+        val locationText = b.inputLocation.text?.toString()?.trim().orEmpty()
         val isPublic = b.switchPublic.isChecked
 
         if (name.isBlank()) {
@@ -164,159 +79,125 @@ class CreateRaceActivity : BaseActivity() {
             return
         }
 
+        // If user never picked a type, default to Open run
+        val typeToSave = selectedType ?: b.inputType.text?.toString()?.trim().takeIf { !it.isNullOrBlank() }
+        ?: "Open run"
+
         b.btnSave.isEnabled = false
 
         val visibility = if (isPublic) "public" else "private"
         val ownerUid = user.uid
         val ownerName = user.displayName ?: user.email ?: "Unknown"
 
-        // ✅ For races: location is OPTIONAL
-
-        // Priority 1: user picked a Google Place
-        if (selectedLocationName != null && selectedLat != null && selectedLng != null) {
-            saveRaceToFirestore(
+        if (locationText.isBlank()) {
+            saveTrackToFirestore(
                 name = name,
                 description = description,
                 distanceMiles = distanceMiles,
+                type = typeToSave,
                 visibility = visibility,
                 ownerUid = ownerUid,
                 ownerName = ownerName,
-                locationName = selectedLocationName,
-                startLat = selectedLat,
-                startLng = selectedLng
+                addressText = null,
+                lat = null,
+                lng = null
             )
-            return
-        }
-
-        // Priority 2: user typed something (if we ever allow typing) → fallback Geocoder
-        if (uiLocationText.isNotBlank()) {
-            geocodeAndSaveRace(
+        } else {
+            geocodeAndSaveTrack(
                 name = name,
                 description = description,
                 distanceMiles = distanceMiles,
+                type = typeToSave,
                 visibility = visibility,
                 ownerUid = ownerUid,
                 ownerName = ownerName,
-                locationName = uiLocationText
+                addressText = locationText
             )
-            return
         }
-
-        // Priority 3: no location at all → save without coordinates
-        saveRaceToFirestore(
-            name = name,
-            description = description,
-            distanceMiles = distanceMiles,
-            visibility = visibility,
-            ownerUid = ownerUid,
-            ownerName = ownerName,
-            locationName = null,
-            startLat = null,
-            startLng = null
-        )
     }
 
-    // Geocode fallback if user manually typed address (not strictly needed but nice)
-    private fun geocodeAndSaveRace(
+    private fun geocodeAndSaveTrack(
         name: String,
         description: String,
         distanceMiles: Double,
+        type: String,
         visibility: String,
         ownerUid: String,
         ownerName: String,
-        locationName: String
+        addressText: String
     ) {
         thread {
+            var lat: Double? = null
+            var lng: Double? = null
+
             try {
                 val geocoder = Geocoder(this, Locale.getDefault())
-                val results = geocoder.getFromLocationName(locationName, 1)
+                val results = geocoder.getFromLocationName(addressText, 1)
 
-                val (lat, lng, resolvedName) = if (!results.isNullOrEmpty()) {
+                if (!results.isNullOrEmpty()) {
                     val loc = results[0]
-                    val formatted = loc.getAddressLine(0) ?: locationName
-                    Triple(loc.latitude, loc.longitude, formatted)
-                } else {
-                    Triple(null, null, locationName)
-                }
-
-                runOnUiThread {
-                    b.inputLocation.setText(resolvedName)
-
-                    if (lat == null || lng == null) {
-                        Toast.makeText(
-                            this,
-                            "Could not find that address exactly. Saving without coordinates.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                    saveRaceToFirestore(
-                        name = name,
-                        description = description,
-                        distanceMiles = distanceMiles,
-                        visibility = visibility,
-                        ownerUid = ownerUid,
-                        ownerName = ownerName,
-                        locationName = resolvedName,
-                        startLat = lat,
-                        startLng = lng
-                    )
+                    lat = loc.latitude
+                    lng = loc.longitude
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                runOnUiThread {
+            }
+
+            runOnUiThread {
+                if (lat == null || lng == null) {
                     Toast.makeText(
                         this,
-                        "Error looking up address. Saving track without location.",
+                        "Could not resolve that address exactly. Saving track with text only.",
                         Toast.LENGTH_SHORT
                     ).show()
-
-                    saveRaceToFirestore(
-                        name = name,
-                        description = description,
-                        distanceMiles = distanceMiles,
-                        visibility = visibility,
-                        ownerUid = ownerUid,
-                        ownerName = ownerName,
-                        locationName = locationName,
-                        startLat = null,
-                        startLng = null
-                    )
                 }
+
+                saveTrackToFirestore(
+                    name = name,
+                    description = description,
+                    distanceMiles = distanceMiles,
+                    type = type,
+                    visibility = visibility,
+                    ownerUid = ownerUid,
+                    ownerName = ownerName,
+                    addressText = addressText,
+                    lat = lat,
+                    lng = lng
+                )
             }
         }
     }
 
-    // Final write to Firestore (same collection your TracksActivity uses)
-    private fun saveRaceToFirestore(
+    private fun saveTrackToFirestore(
         name: String,
         description: String,
         distanceMiles: Double,
+        type: String,
         visibility: String,
         ownerUid: String,
         ownerName: String,
-        locationName: String?,
-        startLat: Double?,
-        startLng: Double?
+        addressText: String?,
+        lat: Double?,
+        lng: Double?
     ) {
         val data = mutableMapOf<String, Any?>(
             "name" to name,
             "description" to description,
             "distanceMiles" to distanceMiles,
+            "type" to type,
             "visibility" to visibility,
             "ownerUid" to ownerUid,
             "ownerName" to ownerName,
-            "createdAt" to Timestamp.now(),
-            "type" to ""
+            "createdAt" to Timestamp.now()
         )
 
-        if (!locationName.isNullOrBlank()) {
-            data["locationName"] = locationName
+        if (!addressText.isNullOrBlank()) {
+            data["addressText"] = addressText
         }
 
-        if (startLat != null && startLng != null) {
-            data["startLat"] = startLat
-            data["startLng"] = startLng
+        if (lat != null && lng != null) {
+            data["latitude"] = lat
+            data["longitude"] = lng
         }
 
         db.collection("publicRaces")

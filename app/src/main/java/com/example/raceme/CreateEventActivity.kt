@@ -19,7 +19,7 @@ class CreateEventActivity : BaseActivity() {
     private val db by lazy { FirebaseFirestore.getInstance() }
     private val auth by lazy { FirebaseAuth.getInstance() }
 
-    // backing calendar for the event date/time
+    // Holds the chosen event date/time
     private val eventCal: Calendar = Calendar.getInstance()
     private var selectedTimestamp: Timestamp? = null
 
@@ -28,15 +28,15 @@ class CreateEventActivity : BaseActivity() {
         b = ActivityCreateEventBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        // back + cancel
+        // Back + cancel
         b.btnBackCreateEvent.setOnClickListener { finish() }
         b.buttonCancel.setOnClickListener { finish() }
 
-        // date / time
+        // Date & time buttons
         b.buttonPickDate.setOnClickListener { showDatePicker() }
         b.buttonPickTime.setOnClickListener { showTimePicker() }
 
-        // create
+        // Create event button
         b.buttonCreateEvent.setOnClickListener { saveEvent() }
     }
 
@@ -72,7 +72,6 @@ class CreateEventActivity : BaseActivity() {
         val fmt = java.text.SimpleDateFormat("EEE, MMM d • h:mm a", Locale.getDefault())
         val label = fmt.format(eventCal.time)
         b.textSelectedDateTime.text = label
-
         selectedTimestamp = Timestamp(eventCal.time)
     }
 
@@ -81,19 +80,22 @@ class CreateEventActivity : BaseActivity() {
     private fun saveEvent() {
         val title = b.editEventTitle.text?.toString()?.trim().orEmpty()
         val description = b.editEventDescription.text?.toString()?.trim().orEmpty()
-        val address = b.editEventAddress.text?.toString()?.trim().orEmpty()
+
+        val street = b.editAddressStreet.text?.toString()?.trim().orEmpty()
+        val city = b.editAddressCity.text?.toString()?.trim().orEmpty()
+        val state = b.editAddressState.text?.toString()?.trim().orEmpty()
+        val zip = b.editAddressZip.text?.toString()?.trim().orEmpty()
+
         val ts = selectedTimestamp
 
         if (title.isBlank()) {
             Toast.makeText(this, "Please enter an event title", Toast.LENGTH_SHORT).show()
             return
         }
-
-        if (address.isBlank()) {
-            Toast.makeText(this, "Please enter an address / location", Toast.LENGTH_SHORT).show()
+        if (street.isBlank() || city.isBlank() || state.isBlank()) {
+            Toast.makeText(this, "Please enter a full address (street, city, state)", Toast.LENGTH_SHORT).show()
             return
         }
-
         if (ts == null) {
             Toast.makeText(this, "Please pick a date and time", Toast.LENGTH_SHORT).show()
             return
@@ -106,13 +108,26 @@ class CreateEventActivity : BaseActivity() {
             return
         }
 
+        // Build a nice full address string
+        val fullAddressParts = listOf(
+            street,
+            city,
+            if (state.isNotBlank()) state else null,
+            if (zip.isNotBlank()) zip else null
+        ).filterNotNull()
+
+        val fullAddress = fullAddressParts.joinToString(", ")
+
         b.buttonCreateEvent.isEnabled = false
 
-        // Forward-geocode the address on a background thread
         geocodeAndSaveEvent(
             title = title,
             description = description,
-            address = address,
+            street = street,
+            city = city,
+            state = state,
+            zip = zip,
+            fullAddress = fullAddress,
             ownerUid = user.uid,
             ownerName = user.displayName ?: user.email ?: "Unknown",
             whenTs = ts
@@ -122,7 +137,11 @@ class CreateEventActivity : BaseActivity() {
     private fun geocodeAndSaveEvent(
         title: String,
         description: String,
-        address: String,
+        street: String,
+        city: String,
+        state: String,
+        zip: String,
+        fullAddress: String,
         ownerUid: String,
         ownerName: String,
         whenTs: Timestamp
@@ -133,7 +152,7 @@ class CreateEventActivity : BaseActivity() {
 
             try {
                 val geocoder = Geocoder(this, Locale.getDefault())
-                val results = geocoder.getFromLocationName(address, 1)
+                val results = geocoder.getFromLocationName(fullAddress, 1)
 
                 if (!results.isNullOrEmpty()) {
                     val loc = results[0]
@@ -156,7 +175,11 @@ class CreateEventActivity : BaseActivity() {
                 saveEventToFirestore(
                     title = title,
                     description = description,
-                    address = address,
+                    street = street,
+                    city = city,
+                    state = state,
+                    zip = zip,
+                    fullAddress = fullAddress,
                     ownerUid = ownerUid,
                     ownerName = ownerName,
                     whenTs = whenTs,
@@ -170,7 +193,11 @@ class CreateEventActivity : BaseActivity() {
     private fun saveEventToFirestore(
         title: String,
         description: String,
-        address: String,
+        street: String,
+        city: String,
+        state: String,
+        zip: String,
+        fullAddress: String,
         ownerUid: String,
         ownerName: String,
         whenTs: Timestamp,
@@ -180,7 +207,11 @@ class CreateEventActivity : BaseActivity() {
         val data = mutableMapOf<String, Any?>(
             "title" to title,
             "description" to description,
-            "addressText" to address,
+            "addressStreet" to street,
+            "addressCity" to city,
+            "addressState" to state,
+            "addressZip" to zip,
+            "addressFull" to fullAddress,
             "ownerUid" to ownerUid,
             "ownerName" to ownerName,
             "when" to whenTs,
